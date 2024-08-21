@@ -1,0 +1,556 @@
+{% load static %}
+{% load cart_extras %}
+{% load i18n %}
+
+<!DOCTYPE html>
+<html lang="{{ LANGUAGE_CODE }}">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% trans "Caro - Antique Shop" %}</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <link rel="stylesheet" href="{% static 'css/main.css' %}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/lightbox2/2.11.3/css/lightbox.min.css">
+    <link rel="stylesheet" href="https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
+    <style>
+        .burger {
+            display: none;
+            position: relative;
+            z-index: 50;
+            align-items: center;
+            justify-content: flex-end;
+            width: 25px;
+            height: 18px;
+        }
+
+        .burger span {
+            height: 2px;
+            width: 100%;
+            transform: scale(1);
+            background-color: black;
+            transition: transform 0.3s ease;
+        }
+
+        .burger::before, .burger::after {
+            content: '';
+            position: absolute;
+            height: 2px;
+            width: 100%;
+            background-color: black;
+            transition: all 0.3s ease;
+        }
+
+        .burger::before { top: 0; }
+        .burger::after { bottom: 0; }
+
+        .burger.active span { transform: scale(0); }
+
+        .burger.active::before {
+            top: 50%;
+            transform: rotate(-45deg) translate(0, -50%);
+        }
+
+        .burger.active::after {
+            bottom: 50%;
+            transform: rotate(45deg) translate(0, 50%);
+        }
+
+        @media (max-width: 900px) {
+            .burger { display: flex; }
+
+            .nav {
+                display: none;
+                text-align: center;
+                font-size: 30px;
+                flex-direction: column;
+                position: fixed;
+                height: 100%;
+                width: 100%;
+                top: 0;
+                left: 0;
+                z-index: 49;
+                overflow-y: auto;
+                padding: 80px 40px;
+                background-color: white;
+                animation: burgerAnimation 0.4s;
+            }
+
+            .nav.active {
+                display: flex;
+            }
+
+            .nav .nav-link {
+                flex-direction: column;
+                row-gap: 30px;
+            }
+        }
+
+        @keyframes burgerAnimation {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .custom-dropdown-menu.show {
+            transform: translate3d(-10px, 50px, 0px) !important;
+        }
+
+
+        .header-main {
+         display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+            width: 100%;
+            padding-top: 45%;
+            background-image: url("{% static 'images/toskana.jpg' %}");
+            background-size: cover;
+            background-position: center;
+            border-radius: 5px;
+        }
+
+        .header-main .btn {
+        margin-top: auto; /* Отталкивает кнопку вниз */
+        margin-bottom: 40px; /* Отступ снизу, если нужен */
+        align-self: center; /* Центрирует кнопку по горизонтали */
+    }
+
+        .payment-container {
+    width: 400px;
+    padding: 20px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    background-color: #ffffff;
+}
+
+h4 {
+    margin-bottom: 20px;
+    text-align: center;
+    color: #333;
+}
+
+#paypal-button-container {
+    text-align: center;
+}
+
+@media (max-width: 576px) {
+    .payment-container {
+
+    }
+}
+
+        .confirmation-container {
+            max-width: 600px;
+            margin: 50px auto;
+            padding: 30px;
+            border: 1px solid #e0e0e0;
+            border-radius: 10px;
+            background-color: #ffffff;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        }
+        .confirmation-header {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        .confirmation-header h1 {
+            font-size: 2.5rem;
+            color: #28a745;
+        }
+        .confirmation-details {
+            margin-top: 20px;
+        }
+        .confirmation-details h5 {
+            color: #333;
+        }
+        .confirmation-details p {
+            color: #666;
+        }
+        .btn-custom {
+            background-color: #28a745;
+            border-color: #28a745;
+        }
+        .btn-custom:hover {
+            background-color: #218838;
+            border-color: #1e7e34;
+        }
+        .footer-text {
+            text-align: center;
+            margin-top: 30px;
+            color: #999;
+        }
+
+    .image-container {
+        padding: 25px;
+        position: relative;
+
+    }
+
+    .image-link {
+    display: block;
+    position: relative;
+    overflow: hidden;
+    opacity: 0; /* Начальное состояние для анимации */
+    transform: translateY(70px); /* Начальное смещение для анимации */
+    transition: opacity 0.8s ease-out, transform 0.8s ease-out;
+}
+
+    .image-container img {
+            width: 100%;
+            height: 100%;
+            max-width: 700px;
+            max-height: 700px;
+            object-fit: cover;
+            border-radius: 5px;
+            display: block;
+            transition: 0.5s ease;
+        }
+
+    .overlay {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 100%;
+    width: 100%;
+    opacity: 0;
+    transition: opacity 0.5s ease, border-radius 0.2s ease;
+
+    background-color: rgba(0, 0, 0, 0.6);
+    border-radius: 5px;
+}
+
+.text {
+    color: white;
+    font-size: 70px;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    text-align: center;
+    white-space: nowrap;
+}
+
+.image-link:hover img {
+    filter: blur(5px); /* Размытие при наведении */
+    transform: scale(1.05);
+    border-radius: 5px;
+}
+
+.image-link:hover .overlay {
+    opacity: 1;
+     border-radius: 5px;
+}
+
+    .animate-on-scroll.visible {
+        opacity: 1;
+        transform: translateY(0);
+}
+
+         /* Chat Button */
+        .chat-button-container {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            z-index: 1000;
+        }
+
+        .chat-button {
+            background-color: #343a41;
+            color: white;
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+
+        .chat-button i {
+            font-size: 28px;
+        }
+
+        /* Chat Window */
+        .chat-window {
+            position: fixed;
+            bottom: 90px;
+            right: 20px;
+            width: 250px;
+            background-color: white;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            z-index: 1001;
+        }
+
+        .chat-window-header {
+            background-color: #343a41;
+            color: white;
+            padding: 10px;
+            border-radius: 10px 10px 0 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .chat-window-header span {
+            font-size: 16px;
+        }
+
+        .close-chat {
+            cursor: pointer;
+            font-size: 50px;
+        }
+
+        .add-to-favorites:hover i {
+            color: white; /* Измените цвет на нужный вам */
+        }
+
+        .redirect-login:hover i {
+            color: white;
+        }
+
+        /* Изменение цвета иконки при наведении на кнопку "Добавить в корзину" */
+        .cart-button:hover i {
+            color: white; /* Измените цвет на нужный вам */
+        }
+
+        .remove-favorite-button:hover i {
+            color: white;
+        }
+
+
+         .add-to-favorites:hover, .cart-button:hover, .remove-favorite-button:hover, .redirect-login:hover {
+            background-color: rgba(0, 0, 0, 0.8); /* Цвет фона кнопки при наведении */
+
+        }
+
+        .chat-window-body {
+            padding: 15px;
+        }
+
+        .chat-window-body p {
+            margin-bottom: 10px;
+        }
+
+        .chat-window-body a {
+            text-decoration: none;
+        }
+
+        /* Hidden by default */
+        .d-none {
+            display: none;
+        }
+
+
+    .header-main {
+        opacity: 0; /* Начальное состояние (скрыто) */
+        transform: translateY(-20px); /* Смещение вверх */
+        transition: opacity 1s ease-out, transform 1s ease-out; /* Плавный переход */
+    }
+
+    .header-main.show {
+        opacity: 1; /* Конечное состояние (полностью видно) */
+        transform: translateY(0); /* Возвращаем в исходное положение */
+    }
+
+
+    </style>
+</head>
+<body class="d-flex flex-column min-vh-100">
+<header class="bg-white py-3 border-bottom header">
+    <div class="container-fluid d-flex justify-content-between align-items-center" style="font-size: 20px;">
+        <a href="{% url 'new_index' %}" class="text-dark text-decoration-none">
+            <img src="{% static 'images/new_logo.png' %}" alt="Caro" class="main_logo"
+                 style="width: 140px; height: 40px;">
+        </a>
+        <a class="nav-link search"><i class="fas fa-search" style="color: black;"></i></a>
+        <form class="form-inline my-2 my-lg-0 block" id="block1" action="{% url 'search' %}" method="get">
+            <input class="form-control mr-sm-2" type="search" placeholder="{% trans 'Search' %}"
+                   aria-label="{% trans 'Search' %}" name="q">
+            <button class="btn btn-outline-secondary my-2 my-sm-0" type="submit">
+                <i class="fas fa-search" style="color: grey;"></i>
+            </button>
+        </form>
+        <div class="d-flex align-items-center ml-auto" style="font-size: 20px;">
+
+            <nav class="nav">
+                <a href="{% url 'product_list' %}" class="nav-link">{% trans 'Home' %}</a>
+                <a href="{% url 'product_by_tag' 'Furniture' %}" class="nav-link">{% trans 'Furniture' %}</a>
+                <a href="{% url 'product_by_tag' 'Watches' %}" class="nav-link">{% trans 'Watches' %}</a>
+                <a href="{% url 'product_by_tag' 'Fabrics' %}" class="nav-link">{% trans 'Fabrics' %}</a>
+                <a href="{% url 'product_by_tag' 'Realty' %}" class="nav-link">{% trans 'Realty' %}</a>
+            </nav>
+            {% if user.is_authenticated %}
+            <a href="{% url 'cart:cart_detail' %}" style="color: black;" class="nav-link position-relative">
+                <i class="fas fa-shopping-cart"></i>
+                <span style="right: -3px; font-size: 12px;"
+                      class="badge badge-pill badge-secondary position-absolute cart-count">{{ cart_total_quantity }}</span>
+            </a>
+            <a href="{% url 'favorites_list' %}" style="color: black;" class="nav-link position-relative">
+                <i class="fas fa-heart"></i>
+            </a>
+            {% else %}
+            <a href="{% url 'login' %}" style="color: black;" class="nav-link position-relative">
+                <i class="fas fa-shopping-cart"></i>
+            </a>
+            <a href="{% url 'login' %}" style="color: black;" class="nav-link position-relative">
+                <i class="fas fa-heart"></i>
+            </a>
+            {% endif %}
+            {% if user.is_authenticated %}
+            <a href="{% url 'account' %}" class="nav-link" style="color: black;"><i class="fas fa-user"></i></a>
+            {% else %}
+            <a href="{% url 'login' %}" class="nav-link" style="color: black;"><i class="fas fa-user"></i></a>
+            {% endif %}
+
+            <div class="dropdown dropstart">
+                <a class="nav-link dropdown-toggle"
+                   style="color: black; padding-left: 12px; padding-right: 15px; outline: none;" href="#" role="button"
+                   id="languageDropdown"
+                   data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    <img src="{% static 'images/icon-planet-earth.png' %}" alt="{% trans 'Planet' %}"
+                         style="width: 24px; height: 24px;">
+                </a>
+                <div class="dropdown-menu custom-dropdown-menu" style="transform: translate3d(-15px, 50px, 0px);"
+                     aria-labelledby="languageDropdown">
+                    <form action="{% url 'set_language' %}" method="post">
+                        {% csrf_token %}
+                        <input type="hidden" name="next" value="{{ request.path }}">
+                        <button class="dropdown-item" type="submit" name="language" value="en">
+                            <img src="{% static 'images/great-britain.png' %}" alt="{% trans 'English' %}"
+                                 style="width: 30px; height: 30px;">
+                        </button>
+                        <button class="dropdown-item" type="submit" name="language" value="it">
+                            <img src="{% static 'images/italy.png' %}" alt="{% trans 'Italian' %}"
+                                 style="width: 30px; height: 30px;">
+                        </button>
+                        <button class="dropdown-item" type="submit" name="language" value="tr">
+                            <img src="{% static 'images/turkey.png' %}" alt="{% trans 'Turkish' %}"
+                                 style="width: 30px; height: 30px;">
+                        </button>
+                    </form>
+                </div>
+            </div>
+
+            <div class="burger">
+                <span></span>
+            </div>
+        </div>
+    </div>
+</header>
+
+<main class="container my-5 flex-grow-5 d-flex justify-content-center">
+    <div class="d-flex flex-wrap justify-content-center">
+        {% block content %}
+        {% endblock %}
+    </div>
+</main>
+<div class="chat-button-container">
+    <span id="chatButton" class="chat-button">
+        <i class="bi bi-chat-dots-fill"></i>
+    </span>
+    <div id="chatWindow" class="chat-window d-none">
+        <div class="chat-window-header">
+            <span>{% trans "Contact the Seller" %}</span>
+            <span id="closeChat" class="close-chat">&times;</span>
+        </div>
+        <div class="chat-window-body">
+            <p>{% trans "You can contact the seller via Telegram." %}</p>
+            <a href="https://t.me/Oldpapacarlos" target="_blank" class="btn btn-dark">{% trans "Go to Telegram" %}</a>
+        </div>
+    </div>
+</div>
+<footer class="bg-white text-center py-3 mt-auto">
+    <div class="container-footer">
+        <p>&copy; 2024 Caro Antique Shop. {% trans "All rights reserved." %}</p>
+    </div>
+</footer>
+<script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.1/umd/popper.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/lightbox2/2.11.3/js/lightbox.min.js"></script>
+<script src="https://code.jquery.com/ui/1.12.1/jquery-ui.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.mask/1.14.16/jquery.mask.min.js"></script>
+
+<script>
+    function initializeAutocomplete(id) {
+        $("#" + id).autocomplete({
+            source: function (request, response) {
+                $.ajax({
+                    url: "https://nominatim.openstreetmap.org/search",
+                    dataType: "json",
+                    data: {
+                        q: request.term,
+                        format: "json",
+                        addressdetails: 1,
+                        limit: 5,
+                        language: 'en-US',
+                    },
+                    success: function (data) {
+                        response($.map(data, function (item) {
+                            return {
+                                label: item.display_name,
+                                value: item.display_name,
+                                address: item.address
+                            };
+                        }));
+                    }
+                });
+            },
+            select: function (event, ui) {
+                var address = ui.item.address;
+                $("#id_shipping_address").val(address.road || "");
+                $("#id_billing_country").val(address.country || "");
+                $("#id_billing_city").val(address.city || address.town || "");
+                $("#id_billing_street").val(address.road || "");
+                $("#id_billing_house").val(address.house_number || "");
+            }
+        });
+    }
+
+    $(document).ready(function () {
+        initializeAutocomplete('id_shipping_country');
+        initializeAutocomplete('id_shipping_city');
+        initializeAutocomplete('id_shipping_street');
+        initializeAutocomplete('id_billing_country');
+        initializeAutocomplete('id_billing_city');
+        initializeAutocomplete('id_billing_street');
+    });
+</script>
+<script>
+    $(document).ready(function() {
+        $(".search").click(function() {
+            $(".block").slideToggle();
+        });
+    });
+</script>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        document.querySelector('.burger').addEventListener('click', function() {
+            this.classList.toggle('active');
+            document.querySelector('.nav').classList.toggle('active');
+        });
+    });
+</script>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const chatButton = document.getElementById('chatButton');
+        const chatWindow = document.getElementById('chatWindow');
+        const closeChat = document.getElementById('closeChat');
+
+        chatButton.addEventListener('click', function() {
+            chatWindow.classList.toggle('d-none');
+        });
+
+        closeChat.addEventListener('click', function() {
+            chatWindow.classList.add('d-none');
+        });
+    });
+</script>
+
+</body>
+</html>

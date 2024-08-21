@@ -1,0 +1,294 @@
+{% extends 'base_mobile.html' %}
+
+
+{% block content %}
+<div class="container">
+    <h1 class="my-3 d-flex justify-content-center">Admin Dashboard</h1>
+
+    <!-- Products Section -->
+    <h2 class="d-flex justify-content-center">Products</h2>
+    <div id="product-list" class="mb-4 ">
+        {% for product in products %}
+        <div class="card mb-3" data-id="{{ product.id }}">
+            <div class="card-body">
+                <h3 class="card-title">{{ product.name }}</h3>
+                <p class="card-text">{{ product.description }}</p>
+                <p class="card-text"><strong>${{ product.price }}</strong></p>
+                <button class="btn btn-primary edit-product" data-id="{{ product.id }}">Edit</button>
+                <button class="btn btn-danger delete-product" data-id="{{ product.id }}">Delete</button>
+                <button class="btn btn-secondary manage-images" data-id="{{ product.id }}">Manage Images</button>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    <button id="add-product" class="btn btn-success d-flex justify-content-center">Add New Product</button>
+
+    <!-- Product Form Modal -->
+    <div class="modal fade" id="product-form-modal" tabindex="-1" role="dialog" aria-labelledby="productFormModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="productFormModalLabel">Product</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <form id="product-form">
+                        {% csrf_token %}
+                        <input type="hidden" name="id" id="product-id">
+                        <div class="form-group">
+                            <label for="product-name">Name</label>
+                            <input type="text" class="form-control" name="name" id="product-name" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="product-description">Description</label>
+                            <textarea class="form-control" name="description" id="product-description" required></textarea>
+                        </div>
+                        <div class="form-group">
+                            <label for="product-price">Price</label>
+                            <input type="number" step="0.01" class="form-control" name="price" id="product-price" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="product-tags">Tags</label>
+                            <select class="form-control" name="tags" id="product-tags" multiple>
+                                {% for tag in tags %}
+                                <option value="{{ tag.id }}">{{ tag.name }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <button type="submit" class="btn btn-primary">Save</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Tags Section -->
+    <h2 class="mt-5 d-flex justify-content-center">Tags</h2>
+    <div id="tag-list" class="mb-4">
+        {% for tag in tags %}
+        <div class="card mb-3" data-id="{{ tag.id }}">
+            <div class="card-body">
+                <h3 class="card-title">{{ tag.name }}</h3>
+                <button class="btn btn-primary edit-tag" data-id="{{ tag.id }}">Edit</button>
+                <button class="btn btn-danger delete-tag" data-id="{{ tag.id }}">Delete</button>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    <button id="add-tag" class="btn btn-success">Add New Tag</button>
+
+    <!-- Tag Form Modal -->
+    <div class="modal fade" id="tag-form-modal" tabindex="-1" role="dialog" aria-labelledby="tagFormModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="tagFormModalLabel">Tag</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <form id="tag-form">
+                        {% csrf_token %}
+                        <input type="hidden" name="id" id="tag-id">
+                        <div class="form-group">
+                            <label for="tag-name">Name</label>
+                            <input type="text" class="form-control" name="name" id="tag-name" required>
+                        </div>
+                        <button type="submit" class="btn btn-primary">Save</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Product Images Section -->
+    <div class="modal fade" id="product-images-modal" tabindex="-1" role="dialog" aria-labelledby="productImagesModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="productImagesModalLabel">Manage Images for <span id="product-images-name"></span></h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div id="product-images-list" class="mb-4"></div>
+                    <form id="product-image-form" enctype="multipart/form-data">
+                        {% csrf_token %}
+                        <input type="hidden" name="product_id" id="product-images-product-id">
+                        <div class="form-group">
+                            <label for="product-image">Upload Image</label>
+                            <input type="file" class="form-control-file" name="image" id="product-image">
+                        </div>
+                        <button type="submit" class="btn btn-primary">Add Image</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.bundle.min.js"></script>
+<script>
+$(document).ready(function() {
+    function showProductForm(product = null) {
+        $('#product-id').val(product ? product.id : '');
+        $('#product-name').val(product ? product.name : '');
+        $('#product-description').val(product ? product.description : '');
+        $('#product-price').val(product ? product.price : '');
+        if (product && product.tags) {
+            $('#product-tags').val(product.tags.map(tag => tag.id));
+        } else {
+            $('#product-tags').val([]);
+        }
+        $('#product-form-modal').modal('show');
+    }
+
+    function showTagForm(tag = null) {
+        $('#tag-id').val(tag ? tag.id : '');
+        $('#tag-name').val(tag ? tag.name : '');
+        $('#tag-form-modal').modal('show');
+    }
+
+    function showProductImages(product) {
+        $('#product-images-name').text(product.name);
+        $('#product-images-product-id').val(product.id);
+        $('#product-images-list').empty();
+        product.images.forEach(image => {
+            $('#product-images-list').append(`
+                <div class="product-image" data-id="${image.id}">
+                    <img src="${image.url}" alt="${product.name}" class="img-thumbnail">
+                    <button class="btn btn-danger delete-image" data-id="${image.id}">Delete</button>
+                </div>
+            `);
+        });
+        $('#product-images-modal').modal('show');
+    }
+
+    $('#add-product').click(function() {
+        showProductForm();
+    });
+
+    $('#product-list').on('click', '.edit-product', function() {
+        const productId = $(this).data('id');
+        $.get(`/admin_panel/products/${productId}/`, function(product) {
+            showProductForm(product);
+        });
+    });
+
+    $('#product-list').on('click', '.delete-product', function() {
+        const productId = $(this).data('id');
+        if (confirm('Are you sure you want to delete this product?')) {
+            $.ajax({
+                url: `/admin_panel/products/${productId}/delete/`,
+                type: 'POST',
+                data: {
+                    csrfmiddlewaretoken: '{{ csrf_token }}'
+                },
+                success: function() {
+                    location.reload();
+                }
+            });
+        }
+    });
+
+    $('#product-list').on('click', '.manage-images', function() {
+        const productId = $(this).data('id');
+        $.get(`/admin_panel/products/${productId}/images/`, function(product) {
+            showProductImages(product);
+        });
+    });
+
+    $('#product-form').submit(function(e) {
+        e.preventDefault();
+        const productId = $('#product-id').val();
+        const url = productId ? `/admin_panel/products/${productId}/edit/` : '/admin_panel/products/create/';
+        $.ajax({
+            url: url,
+            type: 'POST',
+            data: $(this).serialize(),
+            success: function() {
+                location.reload();
+            }
+        });
+    });
+
+    $('#add-tag').click(function() {
+        showTagForm();
+    });
+
+    $('#tag-list').on('click', '.edit-tag', function() {
+        const tagId = $(this).data('id');
+        $.get(`/admin_panel/tags/${tagId}/`, function(tag) {
+            showTagForm(tag);
+        });
+    });
+
+    $('#tag-list').on('click', '.delete-tag', function() {
+        const tagId = $(this).data('id');
+        if (confirm('Are you sure you want to delete this tag?')) {
+            $.ajax({
+                url: `/admin_panel/tags/${tagId}/delete/`,
+                type: 'POST',
+                data: {
+                    csrfmiddlewaretoken: '{{ csrf_token }}'
+                },
+                success: function() {
+                    location.reload();
+                }
+            });
+        }
+    });
+
+    $('#tag-form').submit(function(e) {
+        e.preventDefault();
+        const tagId = $('#tag-id').val();
+        const url = tagId ? `/admin_panel/tags/${tagId}/edit/` : '/admin_panel/tags/create/';
+        $.ajax({
+            url: url,
+            type: 'POST',
+            data: $(this).serialize(),
+            success: function() {
+                location.reload();
+            }
+        });
+    });
+
+    $('#product-image-form').submit(function(e) {
+        e.preventDefault();
+        const productId = $('#product-images-product-id').val();
+        const formData = new FormData(this);
+        $.ajax({
+            url: `/admin_panel/products/${productId}/images/`,
+            type: 'POST',
+            data: formData,
+            processData: false,
+            contentType: false,
+            success: function() {
+                location.reload();
+            }
+        });
+    });
+
+    $('#product-images-list').on('click', '.delete-image', function() {
+        const imageId = $(this).data('id');
+        if (confirm('Are you sure you want to delete this image?')) {
+            $.ajax({
+                url: `/admin_panel/images/${imageId}/delete/`,
+                type: 'POST',
+                data: {
+                    csrfmiddlewaretoken: '{{ csrf_token }}'
+                },
+                success: function() {
+                    location.reload();
+                }
+            });
+        }
+    });
+});
+</script>
+{% endblock %}

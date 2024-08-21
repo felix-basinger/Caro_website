@@ -1,0 +1,346 @@
+{% extends 'base_desktop.html' %}
+{% load static %}
+{% load i18n %}
+{% block content %}
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/fancybox/3.5.7/jquery.fancybox.min.css"/>
+
+<style>
+    .container {
+        display: flex;
+        flex-direction: row;
+    }
+    .gallery-container {
+        width: 100%;
+        margin-bottom: 20px;
+        position: relative;
+    }
+    .carousel-inner img {
+        width: 100%;
+        height: auto;
+        border-radius: 8px;
+    }
+    .product-details {
+        width: 100%;
+        margin-left: 30px;
+        padding: 0 20px;
+        border-radius: 8px;
+    }
+    .product-details h1 {
+        text-align: center;
+        font-size: 28px;
+        margin-bottom: 15px;
+    }
+    .product-details p {
+        text-align: justify;
+        font-size: 20px;
+        margin-bottom: 15px;
+    }
+    .product-details strong {
+        font-size: 1.3rem;
+    }
+    .carousel-control-prev-icon,
+    .carousel-control-next-icon {
+        background-color: black;
+        background-size: 100%, 100%;
+    }
+    .carousel-control-prev,
+    .carousel-control-next {
+        width: 12%;
+    }
+    .carousel-indicators {
+        bottom: -10px;
+    }
+    .carousel-indicators li {
+        background-color: white;
+    }
+    .lightbox .lb-close {
+        position: fixed;
+        top: 10px;
+        right: 300px;
+        color: white;
+        font-size: 2rem;
+        z-index: 1000;
+        opacity: 1;
+    }
+
+    .icon-item {
+    text-align: center;
+}
+
+.icon-img {
+    width: 40px; /* Размер иконки */
+    height: 40px;
+    margin-bottom: 10px;
+}
+
+.icon-text {
+    font-size: 16px;
+    color: #333;
+    margin-top: 0;
+}
+</style>
+
+<div class="container my-1">
+    <div class="gallery-container">
+        <!-- Bootstrap Carousel -->
+        <div id="carouselExampleIndicators" class="carousel slide" data-ride="carousel">
+            <ol class="carousel-indicators">
+                {% for image in product.images.all %}
+                <li data-target="#carouselExampleIndicators" data-slide-to="{{ forloop.counter0 }}"
+                    class="{% if forloop.first %}active{% endif %}"></li>
+                {% endfor %}
+            </ol>
+            <div class="carousel-inner">
+                {% for image in product.images.all %}
+                <div class="carousel-item {% if forloop.first %}active{% endif %}">
+                    <a href="{{ image.image.url }}" data-fancybox="gallery">
+                        <img class="d-block w-100" src="{{ image.image.url }}"
+                             alt="{% trans 'Slide' %} {{ forloop.counter }}">
+                    </a>
+                </div>
+                {% endfor %}
+            </div>
+            <a class="carousel-control-prev" href="#carouselExampleIndicators" role="button" data-slide="prev">
+                <span aria-hidden="true"><img src="{% static 'images/left_arrow.png' %}" alt="{% trans 'Previous' %}"
+                                              style="width: 22px; height: 22px;"></span>
+                <span class="sr-only">{% trans 'Previous' %}</span>
+            </a>
+            <a class="carousel-control-next" href="#carouselExampleIndicators" role="button" data-slide="next">
+                <span aria-hidden="true"><img src="{% static 'images/right_arrow.png' %}" alt="{% trans 'Next' %}"
+                                              style="width: 22px; height: 22px;"></span>
+                <span class="sr-only">{% trans 'Next' %}</span>
+            </a>
+        </div>
+    </div>
+
+    <div class="product-details">
+        <h1>{{ product.name }}</h1>
+        <p>{{ product.description }}</p>
+        <div class="d-flex justify-content-between">
+            <p class="price"><strong>{% trans "Price:" %} ${{ product.price }}</strong></p>
+            <div class="d-flex add-to-cart" style="position: relative; gap: 0px;">
+                {% if user.is_authenticated or session_key %}
+                    <button data-url="{% url 'add_to_favorites' product.id %}"
+                            class="btn add-to-favorites"
+                            data-product-id="{{ product.id }}" style="border: 1px solid;  ">
+                        <i class="bi {% if product.id in favorite_product_ids %}bi-heart-fill{% else %}bi-heart{% endif %}"
+                           style="font-size: 24px;"></i>
+                    </button>
+
+                    <button data-url="{% url 'cart:add_to_cart' product.id %}"
+                            class="btn cart-button"
+                            data-product-id="{{ product.id }}" style="border: 1px solid;  ">
+                        <i class="bi {% if product.in_cart %}bi-cart-check-fill{% else %}bi-cart{% endif %}"
+                           style="font-size: 24px; font-style: normal;"> Add to cart</i>
+                    </button>
+                    {% else %}
+                    <button class="btn redirect-login" style="border: 1px solid;  ">
+                         <i class="bi {% if product.id in favorite_product_ids %}bi-heart-fill{% else %}bi-heart{% endif %}"
+                           style="font-size: 24px;"></i>
+                    </button>
+
+                    <button class="btn redirect-login" style="border: 1px solid;  " >
+                        <i class="bi {% if product.in_cart %}bi-cart-check-fill{% else %}bi-cart{% endif %}"
+                           style="font-size: 24px; font-style: normal;"> Add to cart</i>
+                    </button>
+                    {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+<div class="icons-section text-center mt-5">
+    <div class="d-flex justify-content-center align-items-center" style="gap: 20px;">
+        <div class="icon-item mx-3">
+            <img src="{% static 'images/payment-method.png' %}" alt="Icon 1" class="icon-img">
+            <b><p class="icon-text">Secure payment</p></b>
+        </div>
+        <div class="icon-item mx-3">
+            <img src="{% static 'images/icon-badge.png' %}" alt="Icon 2" class="icon-img">
+            <b><p class="icon-text">High quality</p></b>
+        </div>
+        <div class="icon-item mx-3">
+            <img src="{% static 'images/icon-trusted-seller.png' %}" alt="Icon 3" class="icon-img">
+            <b><p class="icon-text">Reliable seller</p></b>
+        </div>
+    </div>
+</div>
+
+<script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
+<!--<script>-->
+<!--    document.addEventListener("DOMContentLoaded", function() {-->
+<!--        const buttons = document.querySelectorAll('.add-to-cart button');-->
+<!--        buttons.forEach(button => {-->
+<!--            button.addEventListener('click', function(event) {-->
+<!--                event.preventDefault();-->
+<!--                const url = this.getAttribute('data-url');-->
+<!--                fetch(url, {-->
+<!--                    method: 'POST',-->
+<!--                    headers: {-->
+<!--                        'X-Requested-With': 'XMLHttpRequest',-->
+<!--                        'X-CSRFToken': '{{ csrf_token }}'-->
+<!--                    }-->
+<!--                })-->
+<!--                .then(response => response.json())-->
+<!--                .then(data => {-->
+<!--                    document.querySelector('.cart-count').textContent = data.quantity;-->
+<!--                })-->
+<!--                .catch(error => console.error('Error:', error));-->
+<!--            });-->
+<!--        });-->
+<!--    });-->
+<!--</script>-->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/fancybox/3.5.7/jquery.fancybox.min.js"></script>
+<script>
+    $(document).ready(function() {
+        $("[data-fancybox='gallery']").fancybox({
+            buttons: [
+                'slideShow',
+                'share',
+                'zoom',
+                'fullScreen',
+                'close'
+            ],
+            loop: true,
+            protect: true
+        });
+    });
+</script>
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        const favoriteButtons = document.querySelectorAll('.add-to-favorites');
+        const productIds = Array.from(favoriteButtons).map(button => button.getAttribute('data-product-id'));
+        const redirectButtons = document.querySelectorAll('.redirect-login');
+        const isAuthenticated = "{{ user.is_authenticated }}";
+
+        redirectButtons.forEach(button => {
+            button.addEventListener('click', function(event) {
+                event.preventDefault();
+                window.location.href = "{% url 'login' %}";
+            });
+        });
+
+        // Функция для обновления иконки лайка в зависимости от состояния
+        function updateFavoriteIcon(icon, isFavorite) {
+            if (isFavorite) {
+                icon.classList.add('bi-heart-fill');
+                icon.classList.remove('bi-heart');
+            } else {
+                icon.classList.add('bi-heart');
+                icon.classList.remove('bi-heart-fill');
+            }
+        }
+
+        // Запрос к серверу для получения текущих статусов лайков
+        fetch(`/get-favorites-status/?product_ids[]=${productIds.join('&product_ids[]=')}`, {
+            method: 'GET',
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest',
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            favoriteButtons.forEach(button => {
+                const productId = button.getAttribute('data-product-id');
+                const icon = button.querySelector('i');
+                const isFavorite = data.favorites.includes(parseInt(productId));
+                updateFavoriteIcon(icon, isFavorite);
+            });
+        })
+        .catch(error => console.error('Error fetching favorites:', error));
+
+        // Обработчик клика по кнопке лайка
+        favoriteButtons.forEach(button => {
+            button.addEventListener('click', function(event) {
+
+                event.preventDefault();
+                const url = this.getAttribute('data-url');
+                const productId = this.getAttribute('data-product-id');
+                const icon = this.querySelector('i');
+
+                fetch(url, {
+                    method: 'POST',
+                    headers: {
+                        'X-Requested-With': 'XMLHttpRequest',
+                        'X-CSRFToken': '{{ csrf_token }}'
+                    }
+                })
+                .then(response => response.json())
+                .then(data => {
+                    const isFavorite = data.status === 'added';
+                    updateFavoriteIcon(icon, isFavorite);
+                })
+                .catch(error => console.error('Error:', error));
+            });
+        });
+    });
+</script>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        const cartButtons = document.querySelectorAll('.cart-button');
+
+        // Функция для обновления иконки корзины в зависимости от состояния
+        function updateCartIcon(icon, isInCart) {
+            if (isInCart) {
+                icon.classList.add('bi-cart-check-fill');
+                icon.classList.remove('bi-cart');
+            } else {
+                icon.classList.add('bi-cart');
+                icon.classList.remove('bi-cart-check-fill');
+            }
+        }
+
+        // Запрос к серверу для получения текущего состояния корзины при загрузке страницы
+        fetch('/get-cart-status/', {
+            method: 'GET',
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest'
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            cartButtons.forEach(button => {
+                const productId = button.getAttribute('data-product-id');
+                const icon = button.querySelector('i');
+                const isInCart = data.cart_items.includes(parseInt(productId));
+                updateCartIcon(icon, isInCart);
+            });
+        })
+        .catch(error => console.error('Error fetching cart status:', error));
+
+        // Обработчик клика по кнопке корзины
+        cartButtons.forEach(button => {
+            button.addEventListener('click', function(event) {
+                event.preventDefault();
+                const productId = this.getAttribute('data-product-id');
+                const url = `/toggle-cart-item/${productId}/`;
+                const icon = this.querySelector('i');
+
+                fetch(url, {
+                    method: 'POST',
+                    headers: {
+                        'X-Requested-With': 'XMLHttpRequest',
+                        'X-CSRFToken': '{{ csrf_token }}'
+                    }
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.status === 'added') {
+                        updateCartIcon(icon, true);
+                    } else if (data.status === 'removed') {
+                        updateCartIcon(icon, false);
+                    }
+                    // Обновление количества товаров в корзине, если требуется
+                    if (data.quantity !== undefined) {
+                        document.querySelector('.cart-count').textContent = data.quantity;
+                    }
+                })
+                .catch(error => console.error('Error:', error));
+            });
+        });
+    });
+</script>
+{% endblock %}

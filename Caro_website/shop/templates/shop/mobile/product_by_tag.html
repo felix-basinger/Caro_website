@@ -1,0 +1,213 @@
+{% extends 'base_mobile.html' %}
+
+{% load static %}
+
+{% block content %}
+<style>
+    .container {
+        padding-left: 0px;
+        padding-right: 0px;
+    }
+    .card {
+        border: none;
+        border-radius: 0px;
+    }
+</style>
+{% if products %}
+<div class="grid-container">
+
+    {% for product in products %}
+
+    <a style="text-decoration: none;" href="{% url 'product_detail' product.pk %}">
+        <div class="card">
+            <img src="{{ product.images.first.image.url }}" class="card-img-top" alt="{{ product.name }}">
+
+            <div class="card-body" style="text-decoration: none;">
+                <div class="d-flex justify-content-end add-to-cart" style="gap: 5px; position: relative">
+                    {% if user.is_authenticated or session_key %}
+                    <button data-url="{% url 'add_to_favorites' product.id %}"
+                            class="btn add-to-favorites"
+                            data-product-id="{{ product.id }}">
+                        <i class="bi {% if product.id in favorite_product_ids %}bi-heart-fill{% else %}bi-heart{% endif %}"
+                           style="font-size: 30px; color: black;"></i>
+                    </button>
+
+                    <button data-url="{% url 'cart:add_to_cart' product.id %}"
+                            class="btn cart-button"
+                            data-product-id="{{ product.id }}" style="padding-right: 0px;">
+                        <i class="bi {% if product.in_cart %}bi-cart-check-fill{% else %}bi-cart{% endif %}"
+                           style="font-size: 30px;"></i>
+                    </button>
+                    {% else %}
+                    <button class="btn redirect-login">
+                        <i class="bi bi-heart" style="font-size: 35px; color: black;"></i>
+                    </button>
+
+                    <button class="btn redirect-login">
+                        <i class="bi bi-cart" style="font-size: 35px;"></i>
+                    </button>
+                    {% endif %}
+
+                </div>
+                <h5 class="card-title" style="color: black; font-size: 28px;">{{ product.name }}</h5>
+                <!--                    <p class="card-text">{{ product.description }}</p>-->
+                <p class="card-text" style="color: black; font-size: 22px;">${{ product.price }}</p>
+                <!--                    <span class="add-to-cart" style="top: 62%;">-->
+                <!--                        <button data-url="{% url 'add_to_favorites' product.id %}" class="btn btn-outline-secondary">-->
+                <!--                         <img src="{% static 'images/new-heart.png' %}" alt="Heart" class="cart-logo" style="width: 25px; height: 25px;" >-->
+                <!--                    </button>-->
+                <!--                    <button data-url="{% url 'cart:add_to_cart' product.id %}" class="btn btn-outline-secondary">-->
+                <!--                         <img src="{% static 'images/icon-cart.png' %}" alt="Cart" class="cart-logo" style="width: 25px; height: 25px;" >-->
+                <!--                    </button>-->
+
+                <!--                </span>-->
+
+            </div>
+        </div>
+    </a>
+    {% endfor %}
+
+</div>
+{% else %}
+<div style="text-align: center; align-items; center;">
+    <h1 style="text-align: center; ">Products in this category are currently out of stock.<br>But they will be
+        available soon!</h1>
+    <a href="{% url 'product_list' %}" class="btn btn-dark">Continue Shopping</a>
+</div>
+{% endif %}
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        const favoriteButtons = document.querySelectorAll('.add-to-favorites');
+        const productIds = Array.from(favoriteButtons).map(button => button.getAttribute('data-product-id'));
+        const isAuthenticated = "{{ user.is_authenticated }}";
+        const redirectButtons = document.querySelectorAll('.redirect-login');
+
+        redirectButtons.forEach(button => {
+            button.addEventListener('click', function(event) {
+                event.preventDefault();
+                window.location.href = "{% url 'login' %}";
+            });
+        });
+
+        // Функция для обновления иконки лайка в зависимости от состояния
+        function updateFavoriteIcon(icon, isFavorite) {
+            if (isFavorite) {
+                icon.classList.add('bi-heart-fill');
+                icon.classList.remove('bi-heart');
+            } else {
+                icon.classList.add('bi-heart');
+                icon.classList.remove('bi-heart-fill');
+            }
+        }
+
+        // Запрос к серверу для получения текущих статусов лайков
+        fetch(`/get-favorites-status/?product_ids[]=${productIds.join('&product_ids[]=')}`, {
+            method: 'GET',
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest',
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            favoriteButtons.forEach(button => {
+                const productId = button.getAttribute('data-product-id');
+                const icon = button.querySelector('i');
+                const isFavorite = data.favorites.includes(parseInt(productId));
+                updateFavoriteIcon(icon, isFavorite);
+            });
+        })
+        .catch(error => console.error('Error fetching favorites:', error));
+
+        // Обработчик клика по кнопке лайка
+        favoriteButtons.forEach(button => {
+            button.addEventListener('click', function(event) {
+
+                event.preventDefault();
+                const url = this.getAttribute('data-url');
+                const productId = this.getAttribute('data-product-id');
+                const icon = this.querySelector('i');
+
+                fetch(url, {
+                    method: 'POST',
+                    headers: {
+                        'X-Requested-With': 'XMLHttpRequest',
+                        'X-CSRFToken': '{{ csrf_token }}'
+                    }
+                })
+                .then(response => response.json())
+                .then(data => {
+                    const isFavorite = data.status === 'added';
+                    updateFavoriteIcon(icon, isFavorite);
+                })
+                .catch(error => console.error('Error:', error));
+            });
+        });
+    });
+</script>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        const cartButtons = document.querySelectorAll('.cart-button');
+
+        // Функция для обновления иконки корзины в зависимости от состояния
+        function updateCartIcon(icon, isInCart) {
+            if (isInCart) {
+                icon.classList.add('bi-cart-check-fill');
+                icon.classList.remove('bi-cart');
+            } else {
+                icon.classList.add('bi-cart');
+                icon.classList.remove('bi-cart-check-fill');
+            }
+        }
+
+        // Запрос к серверу для получения текущего состояния корзины при загрузке страницы
+        fetch('/get-cart-status/', {
+            method: 'GET',
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest'
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            cartButtons.forEach(button => {
+                const productId = button.getAttribute('data-product-id');
+                const icon = button.querySelector('i');
+                const isInCart = data.cart_items.includes(parseInt(productId));
+                updateCartIcon(icon, isInCart);
+            });
+        })
+        .catch(error => console.error('Error fetching cart status:', error));
+
+        // Обработчик клика по кнопке корзины
+        cartButtons.forEach(button => {
+            button.addEventListener('click', function(event) {
+                event.preventDefault();
+                const productId = this.getAttribute('data-product-id');
+                const url = `/toggle-cart-item/${productId}/`;
+                const icon = this.querySelector('i');
+
+                fetch(url, {
+                    method: 'POST',
+                    headers: {
+                        'X-Requested-With': 'XMLHttpRequest',
+                        'X-CSRFToken': '{{ csrf_token }}'
+                    }
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.status === 'added') {
+                        updateCartIcon(icon, true);
+                    } else if (data.status === 'removed') {
+                        updateCartIcon(icon, false);
+                    }
+                    // Обновление количества товаров в корзине, если требуется
+                    if (data.quantity !== undefined) {
+                        document.querySelector('.cart-count').textContent = data.quantity;
+                    }
+                })
+                .catch(error => console.error('Error:', error));
+            });
+        });
+    });
+</script>
+{% endblock %}

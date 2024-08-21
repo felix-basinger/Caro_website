@@ -1,0 +1,86 @@
+{% extends 'base_mobile.html' %}
+{% load static %}
+{% load i18n %}
+
+{% block content %}
+<div class="container  ">
+    <div class="about-us-header text-center">
+        <h1 class="display-4">{% trans "About Us" %}</h1>
+
+    </div>
+
+    <!-- Mission Statement -->
+    <section class="mission-statement my-5">
+        <div class="row">
+            <div class="col-md-6">
+                <img src="{% static 'images/toskana.jpg' %}" alt="{% trans 'Mission Image' %}" class="img-fluid rounded shadow">
+            </div>
+            <div class="col-md-6 d-flex align-items-center my-5">
+                <div>
+                    <h2 class="text-center mb-4">{% trans "Our Mission" %}</h2>
+                    <p>{% trans "At Caro Antique Shop, we are dedicated to bringing you the finest antiques and collectibles from around the world. Our mission is to connect people with the rich history and craftsmanship of times gone by." %}</p>
+                    <p>{% trans "We carefully curate our collection to ensure that each piece we offer is unique and tells a story. We believe that antiques are more than just objects; they are a bridge to the past, a way to preserve and cherish the history of our world." %}</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Our Team -->
+<!--    <section class="our-team my-5">-->
+<!--        <h2 class="text-center mb-5">{% trans "Meet Our Team" %}</h2>-->
+<!--        <div class="row">-->
+<!--            <div class="col-md-4 text-center">-->
+<!--                <img src="{% static 'images/guy-1.jpg' %}" alt="{% trans 'Team Member 1' %}" class="img-fluid rounded-circle mb-3 shadow">-->
+<!--                <h4>{% trans "John Doe" %}</h4>-->
+<!--                <p class="text-muted">{% trans "Founder & CEO" %}</p>-->
+<!--                <p>{% trans "John has over 20 years of experience in the antiques industry and has a passion for finding rare and unique items." %}</p>-->
+<!--            </div>-->
+<!--            <div class="col-md-4 text-center">-->
+<!--                <img src="{% static 'images/guy-2.jpg' %}" alt="{% trans 'Team Member 2' %}" class="img-fluid rounded-circle mb-3 shadow">-->
+<!--                <h4>{% trans "Jane Smith" %}</h4>-->
+<!--                <p class="text-muted">{% trans "Head of Sales" %}</p>-->
+<!--                <p>{% trans "Jane leads our sales team with a deep knowledge of antiques and a commitment to customer satisfaction." %}</p>-->
+<!--            </div>-->
+<!--            <div class="col-md-4 text-center">-->
+<!--                <img src="{% static 'images/guy-3.jpg' %}" alt="{% trans 'Team Member 3' %}" class="img-fluid rounded-circle mb-3 shadow">-->
+<!--                <h4>{% trans "Richard Roe" %}</h4>-->
+<!--                <p class="text-muted">{% trans "Chief Curator" %}</p>-->
+<!--                <p>{% trans "Richard is our expert curator, responsible for selecting the finest pieces to add to our collection." %}</p>-->
+<!--            </div>-->
+<!--        </div>-->
+<!--    </section>-->
+
+    <!-- Why Choose Us -->
+    <section class="why-choose-us my-5">
+        <h2 class="text-center mb-5">{% trans "Why Choose Us?" %}</h2>
+        <div class="row">
+            <div class="col-md-4 text-center">
+                <i class="fas fa-award fa-3x mb-3 "></i>
+                <h4>{% trans "Quality Assurance" %}</h4>
+                <p>{% trans "We guarantee the authenticity and quality of every item we sell." %}</p>
+            </div>
+            <div class="col-md-4 text-center">
+                <i class="fas fa-shipping-fast fa-3x mb-3  "></i>
+                <h4>{% trans "Worldwide Shipping" %}</h4>
+                <p>{% trans "We ship our products globally with care and attention to detail." %}</p>
+            </div>
+            <div class="col-md-4 text-center">
+                <i class="fas fa-handshake fa-3x mb-3 "></i>
+                <h4>{% trans "Customer Satisfaction" %}</h4>
+                <p>{% trans "Our customers are our top priority, and we strive to exceed their expectations." %}</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Contact Information -->
+    <section class="contact-info my-5">
+        <h2 class="text-center mb-4">{% trans "Contact Us" %}</h2>
+        <p class="text-center">{% trans "If you have any questions or would like to learn more about our products, feel free to reach out." %}</p>
+        <div class="text-center">
+            <p><i class="fas fa-phone-alt"></i> {% trans "+123 456 7890" %}</p>
+            <p><i class="fas fa-envelope"></i> <a href="mailto:info@caroantiqueshop.com">{% trans "info@caroantiqueshop.com" %}</a></p>
+            <p><i class="fas fa-map-marker-alt"></i> {% trans "123 Antique Street, Old Town, City, Country" %}</p>
+        </div>
+    </section>
+</div>
+{% endblock %}

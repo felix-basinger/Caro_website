@@ -1,0 +1,24 @@
+{% extends 'base_mobile.html' %}
+{% load static %}
+{% load i18n %}
+
+{% block content %}
+<div class="confirmation-container"  style="margin: 0;">
+    <div class="confirmation-header">
+        <h1>Thank You!</h1>
+        <p style="font-size: 20px;">Your payment was successful.</p>
+    </div>
+
+
+
+    <div class="text-center mt-4">
+        <a href="/" class="btn btn-custom btn-lg">Return to Home</a>
+<!--        <a href="/shop" class="btn btn-outline-secondary btn-lg ms-2">Continue Shopping</a>-->
+    </div>
+    <div class="footer-text">
+    <p>If you have any questions, feel free to <a href="https://t.me/Oldpapacarlos">contact us</a>.</p>
+</div>
+</div>
+
+
+{% endblock %}

@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            color: #333;
+        }
+        .container {
+            width: 80%;
+            margin: 0 auto;
+            padding: 20px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+        .header {
+            text-align: center;
+            padding-bottom: 20px;
+            border-bottom: 1px solid #ddd;
+        }
+        .details {
+            margin-top: 20px;
+        }
+        .details h2 {
+            color: #555;
+        }
+        .details p {
+            margin: 5px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Order Confirmation</h1>
+        </div>
+        <div class="details">
+            <h2>Shipping Details:</h2>
+            <p><strong>Name:</strong> {{ shipping_name }}</p>
+            <p><strong>Address:</strong> {{ shipping_address }}</p>
+            <p><strong>City:</strong> {{ shipping_city }}</p>
+            <p><strong>State:</strong> {{ shipping_state }}</p>
+            <p><strong>Zip Code:</strong> {{ shipping_zip_code }}</p>
+            <p><strong>Country:</strong> {{ shipping_country }}</p>
+        </div>
+        <div class="details">
+            <h2>Order Details:</h2>
+            <p><strong>Order ID:</strong> {{ paypal_order_id }}</p>
+            <p><strong>Total Amount:</strong> ${{ total_amount }}</p>
+            <p><strong>Status:</strong> {{ status }}</p>
+        </div>
+    </div>
+</body>
+</html>
