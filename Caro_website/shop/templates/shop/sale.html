@@ -1,77 +1,61 @@
-{% extends 'base_mobile.html' %}
-{% load static %}
-{% load i18n %}
+{% extends 'base_desktop.html' %}
 
 {% block content %}
-<style>
-    .container {
-        padding-left: 0px;
-        padding-right: 0px;
-    }
-    .card {
-        border: none;
-        border-radius: 0px;
-    }
-</style>
-{% if products %}
 <div class="grid-container">
-
-    {% for product in products %}
-
-    <a style="text-decoration: none;" href="{% url 'product_detail' product.pk %}">
-        <div class="card">
-            <img src="{{ product.images.first.image.url }}" class="card-img-top" alt="{{ product.name }}">
-
-            <div class="card-body" style="text-decoration: none;">
-                <div class="d-flex justify-content-end add-to-cart" style="gap: 5px; position: relative">
-                    {% if user.is_authenticated or session_key %}
-                    <button data-url="{% url 'add_to_favorites' product.id %}"
-                            class="btn add-to-favorites"
-                            data-product-id="{{ product.id }}">
-                        <i class="bi {% if product.id in favorite_product_ids %}bi-heart-fill{% else %}bi-heart{% endif %}"
-                           style="font-size: 30px; color: black;"></i>
-                    </button>
-
-                    <button data-url="{% url 'cart:add_to_cart' product.id %}"
-                            class="btn cart-button"
-                            data-product-id="{{ product.id }}" style="padding-right: 0px;">
-                        <i class="bi {% if product.in_cart %}bi-cart-check-fill{% else %}bi-cart{% endif %}"
-                           style="font-size: 30px;"></i>
-                    </button>
-                    {% else %}
-                    <button class="btn redirect-login">
-                        <i class="bi bi-heart" style="font-size: 30px; color: black;"></i>
-                    </button>
-
-                    <button class="btn redirect-login" style="padding-right: 0px;">
-                        <i class="bi bi-cart" style="font-size: 30px;"></i>
-                    </button>
+    {% if products %}
+        {% for product in products %}
+            <a style="text-decoration: none;" href="{% url 'product_detail' product.pk %}">
+                <div class="card" style="border-radius: 0px; border: 0px;">
+                    <img style="border-radius: 0px;" src="{{ product.images.first.image.url }}" class="card-img-top" alt="{{ product.name }}">
+                    {% if product.discount and product.discount.is_active %}
+                    <div class="discount-label" style="position: absolute; top: 10px; left: 10px; background-color: black; color: white; padding: 5px; border-radius: 3px; font-size: 16px;">
+                        Save {{ product.discount.discount_percent }}%
+                    </div>
                     {% endif %}
+                    <div class="card-body" style="text-decoration: none;">
+                        <div class="d-flex justify-content-end add-to-cart" style="gap: 10px; position: relative">
+                            {% if user.is_authenticated or session_key %}
+                                <button data-url="{% url 'add_to_favorites' product.id %}"
+                                        class="btn add-to-favorites"
+                                        data-product-id="{{ product.id }}" style="padding-bottom: 0;">
+                                    <i class="bi {% if product.id in favorite_product_ids %}bi-heart-fill{% else %}bi-heart{% endif %}"
+                                       style="font-size: 35px;"></i>
+                                </button>
 
+                                <button data-url="{% url 'cart:add_to_cart' product.id %}"
+                                        class="btn cart-button"
+                                        data-product-id="{{ product.id }}" style="padding-bottom: 0;">
+                                    <i class="bi {% if product.in_cart %}bi-cart-check-fill{% else %}bi-cart{% endif %}"
+                                       style="font-size: 35px;"></i>
+                                </button>
+                            {% else %}
+                                <button class="btn redirect-login" style="padding-bottom: 0;">
+                                    <i class="bi bi-heart" style="font-size: 35px;"></i>
+                                </button>
+
+                                <button class="btn redirect-login" style="padding-bottom: 0;">
+                                    <i class="bi bi-cart" style="font-size: 35px;"></i>
+                                </button>
+                            {% endif %}
+                        </div>
+                        <h5 class="card-title" style="color: black; font-size: 26px; text-align: center;">{{ product.name }}</h5>
+                        {% if product.discount and product.discount.is_active %}
+                            <p class="card-text" style="color: black; font-size: 22px; text-align: center;">
+                                <del>${{ product.price|floatformat:2 }}</del>
+                                <span style="color: red;">${{ product.discounted_price|floatformat:2 }}</span>
+                            </p>
+                        {% else %}
+                            <p class="card-text" style="color: black; font-size: 22px; text-align: center;">${{ product.price|floatformat:2 }}</p>
+                        {% endif %}
+                    </div>
                 </div>
-                 <h5 class="card-title" style="color: black; text-align: center;">{{ product.name }}</h5>
-                {% if product.discount and product.discount.is_active %}
-                <p class="card-text" style="color: black; font-size: 22px; text-align: center;">
-                    <del>${{ product.price|floatformat:2 }}</del>
-                    <span style="color: red;">${{ product.discounted_price|floatformat:2 }}</span>
-                </p>
-                <p style="text-align: center; color: green;">Save {{ product.discount.discount_percent }}%!</p>
-                {% else %}
-                <p class="card-text" style="color: black; font-size: 22px; text-align: center;">${{ product.price|floatformat:2 }}</p>
-                {% endif %}
-            </div>
-        </div>
-    </a>
-    {% endfor %}
+            </a>
+        {% endfor %}
+    {% else %}
+        <h1>No products on sale</h1>
+    {% endif %}
+</div>
 
-</div>
-{% else %}
-<div style="text-align: center; align-items; center;">
-    <h1 style="text-align: center; ">Products in this category are currently out of stock.<br>But they will be
-        available soon!</h1>
-    <a href="{% url 'product_list' %}" class="btn btn-dark">Continue Shopping</a>
-</div>
-{% endif %}
 <script>
     document.addEventListener("DOMContentLoaded", function() {
         const favoriteButtons = document.querySelectorAll('.add-to-favorites');
@@ -146,6 +130,7 @@
     document.addEventListener("DOMContentLoaded", function() {
         const cartButtons = document.querySelectorAll('.cart-button');
 
+        // Функция для обновления иконки корзины в зависимости от состояния
         function updateCartIcon(icon, isInCart) {
             if (isInCart) {
                 icon.classList.add('bi-cart-check-fill');
@@ -156,6 +141,7 @@
             }
         }
 
+        // Запрос к серверу для получения текущего состояния корзины при загрузке страницы
         fetch('/get-cart-status/', {
             method: 'GET',
             headers: {
@@ -173,6 +159,7 @@
         })
         .catch(error => console.error('Error fetching cart status:', error));
 
+        // Обработчик клика по кнопке корзины
         cartButtons.forEach(button => {
             button.addEventListener('click', function(event) {
                 event.preventDefault();

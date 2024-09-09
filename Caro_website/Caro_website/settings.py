@@ -29,8 +29,8 @@ ALLOWED_HOSTS = [
     '192.168.8.177',
     '192.168.1.224',
     'localhost',
-    '[::1]',
-    'https://05d8-151-38-21-8.ngrok-free.app',
+    '[::1]:8000',
+    'c41e-151-38-82-204.ngrok-free.app',
 ]
 
 # Application definition
@@ -92,7 +92,7 @@ WSGI_APPLICATION = 'Caro_website.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'postgres',
+        'NAME': 'shop',
         'USER': 'mac',
         'PASSWORD': '12345',
         'HOST': 'localhost',  # Обычно 'localhost'
@@ -123,7 +123,7 @@ AUTH_PASSWORD_VALIDATORS = [
 
 LANGUAGE_CODE = 'en-us'
 
-TIME_ZONE = 'UTC'
+TIME_ZONE = 'Europe/Rome'
 
 USE_I18N = True
 
@@ -171,11 +171,24 @@ LOCALE_PATHS = [
 ]
 
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
-EMAIL_HOST = 'smtp.gmail.com'  # Замените на ваш SMTP-сервер, например smtp.gmail.com
-EMAIL_PORT = 587  # Для TLS используйте 587, для SSL 465
-EMAIL_USE_TLS = True  # Используйте TLS, если ваш сервер использует SSL, установите EMAIL_USE_SSL = True
-EMAIL_HOST_USER = 'basingerfelix17@gmail.com'  # Ваш email
-EMAIL_HOST_PASSWORD = 'ihmlemkgtxgvzaye'  # Пароль или пароль для приложений, если используется двухфакторная аутентификация
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
+EMAIL_HOST_USER = 'basingerfelix17@gmail.com'
+EMAIL_HOST_PASSWORD = 'ihmlemkgtxgvzaye'
 DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
 
 SECURE_CROSS_ORIGIN_OPENER_POLICY = None
+
+CELERY_BROKER_URL = 'redis://localhost:6379/0'
+CELERY_RESULT_BACKEND = 'redis://localhost:6379/0'
+CELERY_ACCEPT_CONTENT = ['json']
+CELERY_TASK_SERIALIZER = 'json'
+CELERY_RESULT_SERIALIZER = 'json'
+CELERY_TIMEZONE = 'Europe/Rome'
+
+
+CSRF_TRUSTED_ORIGINS = [
+    'https://c41e-151-38-82-204.ngrok-free.app',
+]
+

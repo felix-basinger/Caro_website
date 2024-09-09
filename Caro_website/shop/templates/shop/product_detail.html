@@ -118,33 +118,41 @@
         <h1>{{ product.name }}</h1>
         <p>{{ product.description }}</p>
         <div class="d-flex justify-content-between">
-            <p class="price"><strong>{% trans "Price:" %} ${{ product.price }}</strong></p>
+            <p class="price"><strong>{% trans "Price:" %}
+                {% if product.discount and product.discount.is_active %}
+
+                <del>${{ product.price|floatformat:2 }}</del>
+                <span style="color: red;">${{ product.discounted_price|floatformat:2 }}</span>
+
+                {% else %}
+                ${{ product.price|floatformat:2 }}
+                {% endif %}</strong></p>
             <div class="d-flex add-to-cart" style="position: relative; gap: 0px;">
                 {% if user.is_authenticated or session_key %}
-                    <button data-url="{% url 'add_to_favorites' product.id %}"
-                            class="btn add-to-favorites"
-                            data-product-id="{{ product.id }}" style="border: 1px solid;  ">
-                        <i class="bi {% if product.id in favorite_product_ids %}bi-heart-fill{% else %}bi-heart{% endif %}"
-                           style="font-size: 24px;"></i>
-                    </button>
+                <button data-url="{% url 'add_to_favorites' product.id %}"
+                        class="btn add-to-favorites"
+                        data-product-id="{{ product.id }}" style="border: 1px solid;  ">
+                    <i class="bi {% if product.id in favorite_product_ids %}bi-heart-fill{% else %}bi-heart{% endif %}"
+                       style="font-size: 24px;"></i>
+                </button>
 
-                    <button data-url="{% url 'cart:add_to_cart' product.id %}"
-                            class="btn cart-button"
-                            data-product-id="{{ product.id }}" style="border: 1px solid;  ">
-                        <i class="bi {% if product.in_cart %}bi-cart-check-fill{% else %}bi-cart{% endif %}"
-                           style="font-size: 24px; font-style: normal;"> Add to cart</i>
-                    </button>
-                    {% else %}
-                    <button class="btn redirect-login" style="border: 1px solid;  ">
-                         <i class="bi {% if product.id in favorite_product_ids %}bi-heart-fill{% else %}bi-heart{% endif %}"
-                           style="font-size: 24px;"></i>
-                    </button>
+                <button data-url="{% url 'cart:add_to_cart' product.id %}"
+                        class="btn cart-button"
+                        data-product-id="{{ product.id }}" style="border: 1px solid;  ">
+                    <i class="bi {% if product.in_cart %}bi-cart-check-fill{% else %}bi-cart{% endif %}"
+                       style="font-size: 24px; font-style: normal;"> Add to cart</i>
+                </button>
+                {% else %}
+                <button class="btn redirect-login" style="border: 1px solid;  ">
+                    <i class="bi {% if product.id in favorite_product_ids %}bi-heart-fill{% else %}bi-heart{% endif %}"
+                       style="font-size: 24px;"></i>
+                </button>
 
-                    <button class="btn redirect-login" style="border: 1px solid;  " >
-                        <i class="bi {% if product.in_cart %}bi-cart-check-fill{% else %}bi-cart{% endif %}"
-                           style="font-size: 24px; font-style: normal;"> Add to cart</i>
-                    </button>
-                    {% endif %}
+                <button class="btn redirect-login" style="border: 1px solid;  ">
+                    <i class="bi {% if product.in_cart %}bi-cart-check-fill{% else %}bi-cart{% endif %}"
+                       style="font-size: 24px; font-style: normal;"> Add to cart</i>
+                </button>
+                {% endif %}
             </div>
         </div>
     </div>

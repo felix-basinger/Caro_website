@@ -1,6 +1,9 @@
+from datetime import timedelta
+
 from django.conf import settings
 from django.contrib.auth.models import AbstractUser, User
 from django.db import models
+from django.utils import timezone
 
 
 class CustomUser(AbstractUser):
@@ -65,3 +68,12 @@ class Order(models.Model):
 
     class Meta:
         ordering = ['-created_at']
+
+
+class PasswordResetCode(models.Model):
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)  # Обязательно добавьте это поле
+    code = models.CharField(max_length=6)
+    created_at = models.DateTimeField(default=timezone.now)
+
+    def is_valid(self):
+        return self.created_at >= timezone.now() - timedelta(minutes=2)

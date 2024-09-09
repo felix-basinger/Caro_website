@@ -5,6 +5,13 @@ from crispy_forms.layout import Layout, Submit, Row, Column
 from .models import CustomUser, UserProfile
 
 
+class EmailForm(forms.Form):
+    email = forms.EmailField(
+        label="Enter your email",
+        widget=forms.EmailInput(attrs={'class': 'form-control', 'placeholder': 'Enter your email'})
+    )
+
+
 class CustomUserCreationForm(UserCreationForm):
     class Meta(UserCreationForm.Meta):
         model = CustomUser
@@ -134,3 +141,24 @@ class UserProfileForm(forms.ModelForm):
             # ),
             # Submit('submit', 'Save changes', css_class='btn btn-primary btn-block')
         )
+
+
+class PasswordResetRequestForm(forms.Form):
+    email = forms.EmailField()
+
+
+class PasswordResetConfirmForm(forms.Form):
+    code = forms.CharField(max_length=6)
+
+
+class SetNewPasswordForm(forms.Form):
+    new_password = forms.CharField(widget=forms.PasswordInput)
+    confirm_password = forms.CharField(widget=forms.PasswordInput)
+
+    def clean(self):
+        cleaned_data = super().clean()
+        new_password = cleaned_data.get("new_password")
+        confirm_password = cleaned_data.get("confirm_password")
+
+        if new_password != confirm_password:
+            raise forms.ValidationError("Passwords do not match.")

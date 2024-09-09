@@ -13,4 +13,10 @@ urlpatterns = [
     path('tags/create/', views.tag_create, name='tag_create'),
     path('tags/<int:pk>/edit/', views.tag_edit, name='tag_edit'),
     path('tags/<int:pk>/delete/', views.tag_delete, name='tag_delete'),
+    path('discounts/', views.discount_list, name='discount_list'),
+    path('discounts/create/', views.discount_create, name='discount_create'),
+    path('discounts/<int:pk>/', views.discount_detail, name='discount_detail'),
+    path('discounts/<int:pk>/edit/', views.discount_edit, name='discount_edit'),
+    path('discounts/<int:pk>/delete/', views.discount_delete, name='discount_delete'),
+
 ]

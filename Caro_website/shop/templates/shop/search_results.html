@@ -6,8 +6,13 @@
 <div class="grid-container">
     {% for product in results %}
     <a style="text-decoration: none;" href="{% url 'product_detail' product.pk %}">
-        <div class="card">
+        <div class="card" style="border-radius: 0px; border: 0px;">
             <img src="{{ product.images.first.image.url }}" class="card-img-top" alt="{{ product.name }}">
+            {% if product.discount and product.discount.is_active %}
+                <div class="discount-label" style="position: absolute; top: 10px; left: 10px; background-color: black; color: white; padding: 5px; border-radius: 3px; font-size: 16px;">
+                    Save {{ product.discount.discount_percent }}%
+                </div>
+            {% endif %}
             <div class="card-body" style="text-decoration: none;">
                     <div class="d-flex justify-content-end add-to-cart" style="gap: 10px; position: relative">
                         {% if user.is_authenticated or session_key %}
@@ -35,9 +40,16 @@
                     {% endif %}
 
                     </div>
-                    <h5 class="card-title" style="color: black; font-size: 28px;">{{ product.name }}</h5>
-<!--                    <p class="card-text">{{ product.description }}</p>-->
-                    <p class="card-text" style="color: black; font-size: 22px;">${{ product.price }}</p>
+                    <h5 class="card-title" style="color: black; font-size: 28px; text-align: center;">{{ product.name }}</h5>
+
+                   {% if product.discount and product.discount.is_active %}
+                <p class="card-text" style="color: black; font-size: 22px; text-align: center;">
+                    <del>${{ product.price|floatformat:2 }}</del>
+                    <span style="color: red;">${{ product.discounted_price|floatformat:2 }}</span>
+                </p>
+                {% else %}
+                <p class="card-text" style="color: black; font-size: 22px; text-align: center;">${{ product.price|floatformat:2 }}</p>
+                {% endif %}
 <!--                    <span class="add-to-cart" style="top: 62%;">-->
 <!--                        <button data-url="{% url 'add_to_favorites' product.id %}" class="btn btn-outline-secondary">-->
 <!--                         <img src="{% static 'images/new-heart.png' %}" alt="Heart" class="cart-logo" style="width: 25px; height: 25px;" >-->

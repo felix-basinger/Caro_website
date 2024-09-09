@@ -24,3 +24,8 @@ class CartItem(models.Model):
 
     def __str__(self):
         return f'{self.quantity} of {self.product.name}'
+
+    def get_total_price(self):
+        if self.product.discount and self.product.discount.is_active:
+            return self.quantity * self.product.discounted_price
+        return self.quantity * self.product.price

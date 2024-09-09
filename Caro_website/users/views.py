@@ -1,18 +1,24 @@
 import json
+from datetime import timedelta
 
+from django.contrib import messages
 from django.contrib.auth.decorators import login_required
+from django.contrib.auth.models import User
+
 from django.core.mail import send_mail
 from django.http import JsonResponse
 from django.shortcuts import render, redirect, get_object_or_404
-from django.contrib.auth import login, logout
+from django.contrib.auth import login, logout, update_session_auth_hash, get_user_model
 from django.template.loader import render_to_string
+from django.utils import timezone
 from django.utils.html import strip_tags
 from django.views.decorators.csrf import csrf_exempt
-
-from .forms import CustomUserCreationForm, CustomAuthenticationForm, UserForm, UserProfileForm, CheckoutForm
-from .models import UserProfile
+from .tasks import send_order_confirmation_email, send_password_reset_email
+from .forms import CustomUserCreationForm, CustomAuthenticationForm, UserForm, UserProfileForm, CheckoutForm, \
+    PasswordResetConfirmForm, PasswordResetRequestForm, SetNewPasswordForm
+from .models import UserProfile, CustomUser
 from django_user_agents.utils import get_user_agent
-from .models import Order
+from .models import Order, PasswordResetCode
 from cart.models import Cart
 
 
@@ -97,7 +103,6 @@ def edit_profile(request):
     else:
         template = 'users/edit_profile.html'
 
-    # Проверяем, есть ли у пользователя профиль, если нет - создаем
     if not hasattr(request.user, 'userprofile'):
         UserProfile.objects.create(user=request.user)
 
@@ -107,7 +112,6 @@ def edit_profile(request):
         if user_form.is_valid() and profile_form.is_valid():
             user_form.save()
             profile = profile_form.save(commit=False)
-            # Получаем информацию о карте и платежной системе
             card_number = profile_form.cleaned_data.get('card_number')
             # card_type = get_card_type(card_number)
             # last_four_digits = card_number[-4:]
@@ -136,19 +140,27 @@ def checkout(request):
 
     user_profile = UserProfile.objects.get(user=request.user)
     cart = Cart.objects.get(user=request.user)
+
     total_amount = sum(
-        item.quantity * item.product.price for item in cart.items.all())  # метод, который вычисляет общую сумму корзины
+        item.quantity * item.product.price for item in cart.items.all())
+
+    discounted_total_amount = sum(
+        item.quantity * item.product.discounted_price for item in cart.items.all()
+    )
 
     if request.method == 'POST':
         form = CheckoutForm(request.POST, instance=user_profile)
         if form.is_valid():
             form.save()
-            # Здесь можно добавить логику для сохранения заказа или выполнения других действий
-            return redirect('account')  # URL для страницы подтверждения заказа
+            return redirect('account')
     else:
         form = CheckoutForm(instance=user_profile)
 
-    return render(request, template, {'form': form, 'total_amount': total_amount})
+    return render(request, template, {
+        'form': form,
+        'total_amount': total_amount,
+        'discounted_total_amount': discounted_total_amount,
+    })
 
 
 def order_confirmation(request):
@@ -169,7 +181,7 @@ def process_order(request):
         data = json.loads(request.body)
 
         order = Order.objects.create(
-            user=request.user,  # предполагается, что пользователь уже аутентифицирован
+            user=request.user,
             paypal_order_id=data['paypal_order_id'],
             status=data['status'],
             total_amount=data['total_amount'],
@@ -181,44 +193,77 @@ def process_order(request):
             shipping_country=data['shipping_country']
         )
 
-        # Формирование HTML-сообщения
-        html_message = render_to_string('order_email.html', {
-            'shipping_name': order.shipping_name,
-            'shipping_address': order.shipping_address,
-            'shipping_city': order.shipping_city,
-            'shipping_state': order.shipping_state,
-            'shipping_zip_code': order.shipping_zip_code,
-            'shipping_country': order.shipping_country,
-            'paypal_order_id': order.paypal_order_id,
-            'total_amount': order.total_amount,
-            'status': order.status,
-        })
+        send_order_confirmation_email.delay(order.id, request.user.email)
 
-        html_message_user = render_to_string('order_receipt.html', {
-            'user_name': order.user.username,
-            'shipping_name': order.shipping_name,
-            'shipping_address': order.shipping_address,
-            'shipping_city': order.shipping_city,
-            'shipping_state': order.shipping_state,
-            'shipping_zip_code': order.shipping_zip_code,
-            'shipping_country': order.shipping_country,
-            'paypal_order_id': order.paypal_order_id,
-            'total_amount': order.total_amount,
-            'status': order.status,
-        })
-        plain_message = strip_tags(html_message)
-        subject = f'Order Confirmation - {order.paypal_order_id}'
-        from_email = 'basingerfelix17@gmail.com'
-        to_email = request.user.email
-
-        # Отправка письма
-        send_mail(subject, plain_message, to_email, [from_email], html_message=html_message)
-        send_mail(subject, plain_message, from_email, [to_email], html_message=html_message_user)
         status = data.get('status')
-        if status == 'COMPLETED':  # Проверяем, что оплата была успешной
+        if status == 'COMPLETED':
             cart = Cart.objects.get(user=request.user)
             cart.items.all().delete()
         return JsonResponse({'status': 'success'})
 
     return JsonResponse({'error': 'Invalid request method'}, status=400)
 
+
+def password_reset_request(request):
+    if request.method == 'POST':
+        form = PasswordResetRequestForm(request.POST)
+        if form.is_valid():
+            email = form.cleaned_data.get('email')
+            try:
+                user = CustomUser.objects.get(email=email)
+                request.session['reset_email'] = email
+                send_password_reset_email.delay(email)
+                return redirect('password_reset_code')
+            except CustomUser.DoesNotExist:
+                messages.error(request, 'This email is not registered. Please sign up.')
+                return redirect('register')
+    else:
+        form = PasswordResetRequestForm()
+    return render(request, 'users/password_reset_request.html', {'form': form})
+
+
+def password_reset_code(request):
+    if request.method == 'POST':
+        if 'resend_code' in request.POST:
+            email = request.session.get('reset_email')
+            if email:
+                reset_code = PasswordResetCode.objects.filter(user__email=email).last()
+                if reset_code and reset_code.created_at >= timezone.now() - timedelta(minutes=2):
+                    messages.error(request, 'You must wait 2 minutes before resending the code.')
+                else:
+                    send_password_reset_email.delay(email)
+                    messages.success(request, 'A new reset code has been sent to your email.')
+                return redirect('password_reset_code')
+
+        elif 'submit_code' in request.POST:
+            form = PasswordResetConfirmForm(request.POST)
+            if form.is_valid():
+                code = form.cleaned_data.get('code')
+                try:
+                    reset_code = PasswordResetCode.objects.get(
+                        code=code,
+                        created_at__gte=timezone.now() - timedelta(minutes=2)
+                    )
+                    return redirect('set_new_password', user_id=reset_code.user.id)
+                except PasswordResetCode.DoesNotExist:
+                    messages.error(request, 'Invalid or expired code.')
+            return redirect('password_reset_code')
+    else:
+        form = PasswordResetConfirmForm()
+
+    return render(request, 'users/password_reset_code.html', {'form': form})
+
+
+def set_new_password(request, user_id):
+    user = CustomUser.objects.get(id=user_id)
+    if request.method == 'POST':
+        form = SetNewPasswordForm(request.POST)
+        if form.is_valid():
+            user.set_password(form.cleaned_data.get('new_password'))
+            user.save()
+            login(request, user)
+            messages.success(request, 'Your password has been successfully reset.')
+            return redirect('account')
+    else:
+        form = SetNewPasswordForm()
+    return render(request, 'users/set_new_password.html', {'form': form})

@@ -13,8 +13,13 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/lightbox2/2.11.3/css/lightbox.min.css">
     <link rel="stylesheet" href="https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Didact+Gothic&family=Rubik:ital,wght@0,300..900;1,300..900&display=swap"
+          rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
     <style>
+
         .burger {
             display: none;
             position: relative;
@@ -356,15 +361,55 @@ h4 {
         transform: translateY(0); /* Возвращаем в исходное положение */
     }
 
+    .card img {
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    /* Добавлена анимация тени */
+}
+
+.card:hover img {
+    transform: scale(1.03);
+    /* Добавлена тень при увеличении */
+}
+
+        /* Стили для выпадающего списка Home */
+.home-dropdown:hover .home-dropdown-menu {
+    display: block;
+}
+
+.home-dropdown-menu {
+    display: none;
+    position: absolute;
+    left: -5px;
+    right: -10px;
+    background-color: white;
+    border: 1px solid #ccc;
+    padding: 10px;
+    z-index: 1000;
+    min-width: 200px;
+}
+
+.home-dropdown-item {
+    color: black;
+    text-decoration: none;
+    padding: 10px;
+    display: block;
+}
+
+.home-dropdown-item:hover {
+    background-color: #f8f9fa;
+    color: black;
+}
+
+
 
     </style>
 </head>
 <body class="d-flex flex-column min-vh-100">
-<header class="bg-white py-3 border-bottom header">
+<header class="bg-white py-2 border-bottom header" style="padding-bottom: 10px;">
     <div class="container-fluid d-flex justify-content-between align-items-center" style="font-size: 20px;">
         <a href="{% url 'new_index' %}" class="text-dark text-decoration-none">
-            <img src="{% static 'images/new_logo.png' %}" alt="Caro" class="main_logo"
-                 style="width: 140px; height: 40px;">
+            <img src="{% static 'images/design_logo.png' %}" alt="Caro" class="main_logo"
+                 style="width: 140px; height: 50px; margin-bottom: 10px;">
         </a>
         <a class="nav-link search"><i class="fas fa-search" style="color: black;"></i></a>
         <form class="form-inline my-2 my-lg-0 block" id="block1" action="{% url 'search' %}" method="get">
@@ -377,12 +422,30 @@ h4 {
         <div class="d-flex align-items-center ml-auto" style="font-size: 20px;">
 
             <nav class="nav">
-                <a href="{% url 'product_list' %}" class="nav-link">{% trans 'Home' %}</a>
-                <a href="{% url 'product_by_tag' 'Furniture' %}" class="nav-link">{% trans 'Furniture' %}</a>
-                <a href="{% url 'product_by_tag' 'Watches' %}" class="nav-link">{% trans 'Watches' %}</a>
-                <a href="{% url 'product_by_tag' 'Fabrics' %}" class="nav-link">{% trans 'Fabrics' %}</a>
-                <a href="{% url 'product_by_tag' 'Realty' %}" class="nav-link">{% trans 'Realty' %}</a>
+                <a href="{% url 'new_index' %}" class="nav-link home-dropdown-toggle"
+                       role="button" aria-haspopup="true" aria-expanded="false">{% trans 'Home' %}</a>
+                <div class="dropdown home-dropdown">
+
+                    <a href="{% url 'product_list' %}" class="nav-link home-dropdown-toggle" id="homeDropdown"
+                       role="button" aria-haspopup="true" aria-expanded="false">{% trans 'Catalog' %}</a>
+                    <div class="dropdown-menu home-dropdown-menu" aria-labelledby="homeDropdown">
+                        <a class="dropdown-item" href="{% url 'product_by_tag' 'T-shirts' %}">{% trans 'T-shirts' %}</a>
+                        <a class="dropdown-item" href="{% url 'product_by_tag' 'Hoodie' %}">{% trans 'Hoodie' %}</a>
+                        <a class="dropdown-item" href="{% url 'product_by_tag' 'Shoes' %}">{% trans 'Shoes' %}</a>
+                        <a class="dropdown-item" href="{% url 'product_by_tag' 'Caps' %}">{% trans 'Caps' %}</a>
+                    </div>
+                </div>
+                <a href="{% url 'sale_products' %}" class="nav-link home-dropdown-toggle"
+                       role="button" aria-haspopup="true" aria-expanded="false">{% trans 'Sale' %}</a>
+                <a href="{% url 'new_index' %}" class="nav-link home-dropdown-toggle"
+                       role="button" aria-haspopup="true" aria-expanded="false">{% trans 'Contact' %}</a>
+
+<!--                <a href="{% url 'product_by_tag' 'Furniture' %}" class="nav-link">{% trans 'Furniture' %}</a>-->
+<!--                <a href="{% url 'product_by_tag' 'Watches' %}" class="nav-link">{% trans 'Watches' %}</a>-->
+<!--                <a href="{% url 'product_by_tag' 'Fabrics' %}" class="nav-link">{% trans 'Fabrics' %}</a>-->
+<!--                <a href="{% url 'product_by_tag' 'Realty' %}" class="nav-link">{% trans 'Realty' %}</a>-->
             </nav>
+
             {% if user.is_authenticated %}
             <a href="{% url 'cart:cart_detail' %}" style="color: black;" class="nav-link position-relative">
                 <i class="fas fa-shopping-cart"></i>
@@ -414,7 +477,7 @@ h4 {
                     <img src="{% static 'images/icon-planet-earth.png' %}" alt="{% trans 'Planet' %}"
                          style="width: 24px; height: 24px;">
                 </a>
-                <div class="dropdown-menu custom-dropdown-menu" style="transform: translate3d(-15px, 50px, 0px);"
+                <div class="dropdown-menu custom-dropdown-menu" style="transform: translate3d(-15px, 50px, 0px); position: absolute; top: 0;"
                      aria-labelledby="languageDropdown">
                     <form action="{% url 'set_language' %}" method="post">
                         {% csrf_token %}
@@ -459,13 +522,13 @@ h4 {
         </div>
         <div class="chat-window-body">
             <p>{% trans "You can contact the seller via Telegram." %}</p>
-            <a href="https://t.me/Oldpapacarlos" target="_blank" class="btn btn-dark">{% trans "Go to Telegram" %}</a>
+            <a href="https://t.me/basinger_f" target="_blank" class="btn btn-dark">{% trans "Go to Telegram" %}</a>
         </div>
     </div>
 </div>
 <footer class="bg-white text-center py-3 mt-auto">
     <div class="container-footer">
-        <p>&copy; 2024 Caro Antique Shop. {% trans "All rights reserved." %}</p>
+        <p>&copy; 2024 SILK AVENUE. {% trans "All rights reserved." %}</p>
     </div>
 </footer>
 <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
@@ -551,6 +614,40 @@ h4 {
         });
     });
 </script>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+    // Работаем с выпадающим списком Home
+    const homeDropdown = document.querySelector('.home-dropdown');
 
+    homeDropdown.addEventListener('mouseenter', function() {
+        const dropdownMenu = this.querySelector('.home-dropdown-menu');
+        dropdownMenu.classList.add('show');
+    });
+
+    homeDropdown.addEventListener('mouseleave', function() {
+        const dropdownMenu = this.querySelector('.home-dropdown-menu');
+        dropdownMenu.classList.remove('show');
+    });
+
+    // Существующий код для других dropdowns
+    const otherDropdowns = document.querySelectorAll('.dropdown:not(.home-dropdown)');
+
+    otherDropdowns.forEach(dropdown => {
+        dropdown.addEventListener('click', function(event) {
+            event.stopPropagation();
+            const dropdownMenu = this.querySelector('.dropdown-menu');
+            dropdownMenu.classList.toggle('show');
+        });
+    });
+
+    document.addEventListener('click', function() {
+        otherDropdowns.forEach(dropdown => {
+            const dropdownMenu = dropdown.querySelector('.dropdown-menu');
+            dropdownMenu.classList.remove('show');
+        });
+    });
+});
+
+</script>
 </body>
 </html>

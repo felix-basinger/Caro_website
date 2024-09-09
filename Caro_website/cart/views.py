@@ -60,13 +60,13 @@ def update_cart_item_quantity(request, item_id, action):
         else:
             cart_item.delete()
 
-    cart_total_price = sum(item.quantity * item.product.price for item in cart.items.all())
+    cart_total_price = sum(item.get_total_price() for item in cart.items.all())
 
     if request.headers.get('x-requested-with') == 'XMLHttpRequest':
         return JsonResponse({
             'item_id': cart_item.id,
             'quantity': cart_item.quantity,
-            'item_total_price': cart_item.quantity * cart_item.product.price,
+            'item_total_price': cart_item.get_total_price(),
             'cart_total_price': cart_total_price
         })
 

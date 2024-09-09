@@ -1,10 +1,15 @@
 /* caro/shop/static/css/styles.css */
 body {
-    background-color: #f5f5f5; /* Светло-серый фон для всего сайта */
-    font-family: 'Garamond', serif; /* Классический шрифт */
+    background-color: #ffffff; /* Светло-серый фон для всего сайта */
+    font-family: 'Didact Gothic', serif; /* Классический шрифт */
     margin: 0;
+    -webkit-tap-highlight-color: transparent;
 
 }
+
+ a:active, a:hover, a:focus, a {
+    text-decoration: none;
+    }
 
 header, footer {
     background-size: cover;
@@ -23,8 +28,8 @@ h1 {
 .grid-container {
     display: grid;
     max-width: 1440px;
-    grid-template-columns: repeat(auto-fit, minmax(600px, 2fr));
-    gap: 30px; /* Промежуток между колонками */
+    grid-template-columns: repeat(3, 33.33vw);
+    gap: 40px 0px; /* Промежуток между колонками */
     justify-content: center; /* Центрирование блока */
     transition: all 0.3s ease;
 }
@@ -42,8 +47,8 @@ h1 {
     flex: 1 1 450px; /* Гибкий блок с минимальной шириной 300px */
     background-color: #fff; /* Белый фон для карточек */
     padding: 20px;
-    border: 1px solid #ddd;
-    border-radius: 5px;
+
+    border-radius: 0px;
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
     transition: all 0.3s ease; /* Плавное изменение размеров */
     text-decoration: none;
@@ -70,19 +75,43 @@ h1 {
     overflow: hidden;
     white-space: nowrap; /* Для однострочного текста */
     text-overflow: ellipsis;
-    max-width: 270px; /* Установите максимальную ширину для текста */
+    max-width: 100%; /* Установите максимальную ширину для текста */
     text-decoration: none;
 }
 
-@media (max-width: 1320px) {
+@media (max-width: 1420px) {
     .grid-container {
-        grid-template-columns: repeat(2, 1fr); /* 3 колонки при сужении экрана */
+        grid-template-columns: repeat(3, 33.33vw); /* 3 колонки при сужении экрана */
+    }
+}
+
+@media (max-width: 1300px) {
+    .grid-container {
+        grid-template-columns: repeat(3, 380px); /* 3 колонки при сужении экрана */
+    }
+}
+
+@media (max-width: 1190px) {
+    .grid-container {
+        grid-template-columns: repeat(3, 350px); /* 3 колонки при сужении экрана */
+    }
+}
+
+@media (max-width: 1100px) {
+    .grid-container {
+        grid-template-columns: repeat(3, 320px); /* 3 колонки при сужении экрана */
+    }
+}
+
+@media (max-width: 1000px) {
+    .grid-container {
+        grid-template-columns: repeat(3, 290px); /* 3 колонки при сужении экрана */
     }
 }
 
 @media (max-width: 900px) {
     .grid-container {
-        grid-template-columns: repeat(2, 1fr); /* 2 колонки при сужении экрана */
+        grid-template-columns: repeat(2, 50vw); /* 2 колонки при сужении экрана */
     }
 }
 
@@ -296,8 +325,7 @@ table, th {
 
 .dropdown-menu {
     min-width: 70px !important;  /* Установите желаемую ширину */
-    padding: 0;              /* Уменьшите отступы, если необходимо */
-
+    padding: 0;          /* Уменьшите отступы, если необходимо */
 }
 
 .dropdown-toggle {

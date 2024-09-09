@@ -2,9 +2,9 @@ from django.urls import path
 from . import views
 
 urlpatterns = [
-    path('', views.product_list, name='product_list'),
+    path('', views.new_index, name='new_index'),
     path('about/', views.about, name='about'),
-    path('new_index/', views.new_index, name='new_index'),
+    path('all_products/', views.product_list, name='product_list'),
     path('product/<int:pk>/', views.product_detail, name='product_detail'),
     path('furniture/', views.furniture, name='furniture'),
     path('watch/', views.watch, name='watch'),
@@ -18,4 +18,5 @@ urlpatterns = [
     path('get-favorites-status/', views.get_favorites_status, name='get_favorites_status'),
     path('toggle-cart-item/<int:product_id>/', views.toggle_cart_item, name='toggle_cart_item'),
     path('get-cart-status/', views.get_cart_status, name='get_cart_status'),
+    path('sale/', views.sale_products, name='sale_products'),
 ]

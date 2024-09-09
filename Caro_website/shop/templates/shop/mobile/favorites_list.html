@@ -3,63 +3,76 @@
 {% load static %}
 
 {% block content %}
+<style>
+    .container {
+        padding-left: 0px;
+        padding-right: 0px;
+    }
+</style>
 {% if products %}
 <div class="grid-container">
 
     {% for product in products %}
 
     <a style="text-decoration: none;" href="{% url 'product_detail' product.pk %}">
-        <div class="card">
+        <div class="card" style="border-radius: 0px; border: 0px;">
             <img src="{{ product.images.first.image.url }}" class="card-img-top" alt="{{ product.name }}">
 
             <div class="card-body" style="text-decoration: none;">
-                <div class="d-flex justify-content-end add-to-cart" style="gap: 0px; position: relative">
+                 <div class="d-flex justify-content-end add-to-cart" style="gap: 10px; position: relative">
 
                     <button data-url="{% url 'remove_from_favorites' product.id %}"
                             class="btn remove-favorite-button"
-                            data-product-id="{{ product.id }}">
+                            data-product-id="{{ product.id }}" style="padding-bottom: 0;">
                         <i class="bi bi-heartbreak-fill"
-                           style="font-size: 30px; color: black;"></i>
+                           style="font-size: 35px;"></i>
                     </button>
 
                     <button data-url="{% url 'cart:add_to_cart' product.id %}"
                             class="btn cart-button"
-                            data-product-id="{{ product.id }}" style="padding-right: 0px;">
+                            data-product-id="{{ product.id }}" style="padding-bottom: 0;">
                         <i class="bi {% if product.in_cart %}bi-cart-check-fill{% else %}bi-cart{% endif %}"
-                           style="font-size: 30px;"></i>
+                           style="font-size: 35px;"></i>
                     </button>
 
-
-
                 </div>
-                <h5 class="card-title" style="color: black; font-size: 28px;">{{ product.name }}</h5>
+                <h5 class="card-title" style="color: black; text-align: center;">{{ product.name }}</h5>
                 <!--                    <p class="card-text">{{ product.description }}</p>-->
-                <p class="card-text" style="color: black; font-size: 22px;">${{ product.price }}</p>
-                <!--                    <span class="add-to-cart" style="top: 62%;">-->
-                <!--                        <button data-url="{% url 'add_to_favorites' product.id %}" class="btn btn-outline-secondary">-->
-                <!--                         <img src="{% static 'images/new-heart.png' %}" alt="Heart" class="cart-logo" style="width: 25px; height: 25px;" >-->
-                <!--                    </button>-->
-                <!--                    <button data-url="{% url 'cart:add_to_cart' product.id %}" class="btn btn-outline-secondary">-->
-                <!--                         <img src="{% static 'images/icon-cart.png' %}" alt="Cart" class="cart-logo" style="width: 25px; height: 25px;" >-->
-                <!--                    </button>-->
-
-                <!--                </span>-->
+                {% if product.discount and product.discount.is_active %}
+                <p class="card-text" style="color: black; font-size: 22px; text-align: center;">
+                    <del>${{ product.price|floatformat:2 }}</del>
+                    <span style="color: red;">${{ product.discounted_price|floatformat:2 }}</span>
+                </p>
+                <p style="text-align: center; color: green;">Save {{ product.discount.discount_percent }}%!</p>
+                {% else %}
+                <p class="card-text" style="color: black; font-size: 22px; text-align: center;">${{ product.price|floatformat:2 }}</p>
+                {% endif %}
+<!--                <span class="add-to-cart" style="top: 340px;">-->
+<!--                        <button data-url="{% url 'remove_from_favorites' product.id %}"-->
+<!--                                class="btn btn-outline-secondary remove-favorite-button"-->
+<!--                                data-product-id="{{ product.id }}">-->
+<!--                         <img src="{% static 'images/cancel-heart.png' %}" alt="Heart" class="cart-logo"-->
+<!--                              style="width: 25px; height: 25px;">-->
+<!--                    </button>-->
+<!--                    <button data-url="{% url 'cart:add_to_cart' product.id %}" class="btn btn-outline-secondary">-->
+<!--                         <img src="{% static 'images/icon-cart.png' %}" alt="Cart" class="cart-logo"-->
+<!--                              style="width: 25px; height: 25px;">-->
+<!--                    </button>-->
+<!--                </span>-->
 
             </div>
         </div>
     </a>
 
-    {% endfor %}
+     {% endfor %}
 
 
 </div>
 {% else %}
-
 <div style="text-align: center; align-items; center;">
     <h1 style="text-align: center; ">You haven't added your favorite items yet.</h1>
     <a href="{% url 'product_list' %}" class="btn btn-dark">Continue Shopping</a>
 </div>
-
 {% endif %}
 
 <script>
@@ -129,21 +142,30 @@
 </script>
 <script>
     document.addEventListener('DOMContentLoaded', function() {
-    document.querySelectorAll('.remove-favorite-button').forEach(function(button) {
-        button.addEventListener('click', function(event) {
-            event.preventDefault();
-            const productId = this.getAttribute('data-product-id');
-            fetch(`{% url 'remove_from_favorites' 0 %}`.replace('0', productId), {
-                method: 'GET',
-                headers: {
-                    'X-Requested-With': 'XMLHttpRequest'
-                }
-            }).then(() => {
-                location.reload();
+        document.querySelectorAll('.remove-favorite-button').forEach(function(button) {
+            button.addEventListener('click', function(event) {
+                event.preventDefault();
+                const productId = this.getAttribute('data-product-id');
+
+                fetch(`{% url 'remove_from_favorites' 0 %}`.replace('0', productId), {
+                    method: 'GET',
+                    headers: {
+                        'X-Requested-With': 'XMLHttpRequest'
+                    }
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.status === 'ok') {
+                        // Сохраняем информацию об удалении в Local Storage
+                        localStorage.setItem(`favorite_removed_${productId}`, 'true');
+                        // Обновляем страницу или удаляем элемент из DOM
+                        location.reload();
+                    }
+                })
+                .catch(error => console.error('Error:', error));
             });
         });
     });
-});
 </script>
 
 {% endblock %}

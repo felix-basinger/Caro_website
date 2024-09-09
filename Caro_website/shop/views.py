@@ -2,6 +2,7 @@ from django.contrib.auth.decorators import login_required
 from django.db.models import Q
 from django.http import JsonResponse
 from django.shortcuts import render, get_object_or_404, redirect
+from django.utils import timezone
 from django.views.decorators.http import require_POST
 from django_user_agents.utils import get_user_agent
 from .models import Product, Favorite, Tag
@@ -12,11 +13,11 @@ def new_index(request):
     user_agent = get_user_agent(request)
 
     if user_agent.is_mobile:
-        template = 'shop/mobile/new_index.html'
+        template = 'shop/mobile/index.html'
     elif user_agent.is_tablet:
-        template = 'shop/tablet/new_index.html'
+        template = 'shop/tablet/index.html'
     else:
-        template = 'shop/new_index.html'
+        template = 'shop/index.html'
     return render(request, template)
 
 
@@ -36,11 +37,11 @@ def product_list(request):
     user_agent = get_user_agent(request)
 
     if user_agent.is_mobile:
-        template = 'shop/mobile/index.html'
+        template = 'shop/mobile/all_products.html'
     elif user_agent.is_tablet:
-        template = 'shop/tablet/index.html'
+        template = 'shop/tablet/all_products.html'
     else:
-        template = 'shop/index.html'
+        template = 'shop/all_products.html'
 
     products = Product.objects.all().order_by('-created_at')
 
@@ -232,3 +233,23 @@ def get_cart_status(request):
 
     cart_items = cart.items.values_list('product_id', flat=True)
     return JsonResponse({'cart_items': list(cart_items)})
+
+
+def sale_products(request):
+    user_agent = get_user_agent(request)
+
+    if user_agent.is_mobile:
+        template = 'shop/mobile/sale.html'
+    elif user_agent.is_tablet:
+        template = 'shop/tablet/sale.html'
+    else:
+        template = 'shop/sale.html'
+    # Получаем только те продукты, у которых есть активная скидка
+    now = timezone.now()
+    products_on_sale = Product.objects.filter(
+        discount__active=True,
+        discount__start_date__lte=now,
+        discount__end_date__gte=now
+    ).order_by('-discount__added_to_sale_date')
+
+    return render(request, template, {'products': products_on_sale})

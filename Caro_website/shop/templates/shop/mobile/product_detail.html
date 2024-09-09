@@ -1,5 +1,6 @@
 {% extends 'base_mobile.html' %}
 {% load static %}
+{% load i18n %}
 {% block content %}
 
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/fancybox/3.5.7/jquery.fancybox.min.css"/>
@@ -73,7 +74,7 @@
         right: 10px;
         color: white;
         font-size: 2rem;
-        z-index: 1000; /* Ensure it appears above other elements */
+        z-index: 1000;
         opacity: 1;
     }
 
@@ -82,7 +83,7 @@
 }
 
 .icon-img {
-    width: 30px; /* Размер иконки */
+    width: 30px;
     height: 30px;
     margin-bottom: 10px;
 }
@@ -129,7 +130,15 @@
     <div class="product-details">
         <h1>{{ product.name }}</h1>
         <p>{{ product.description }}</p>
-        <p class="price"><strong>Price: ${{ product.price }}</strong></p>
+        <p class="price"><strong>{% trans "Price:" %}
+                {% if product.discount and product.discount.is_active %}
+
+                <del>${{ product.price|floatformat:2 }}</del>
+                <span style="color: red;">${{ product.discounted_price|floatformat:2 }}</span>
+
+                {% else %}
+                ${{ product.price|floatformat:2 }}
+                {% endif %}</strong></p>
 
         <div class="d-flex justify-content-center add-to-cart" style="gap: 0px; position: relative; padding: 15px 0; right: 0;">
             {% if user.is_authenticated or session_key %}

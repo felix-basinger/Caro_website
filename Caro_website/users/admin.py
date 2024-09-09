@@ -1,5 +1,8 @@
 from django.contrib import admin
+from django.contrib.auth.admin import UserAdmin
 
+from .models import CustomUser
+from django.utils.translation import gettext_lazy as _
 from .models import Order
 
 
@@ -25,3 +28,35 @@ class OrderAdmin(admin.ModelAdmin):
 
 
 admin.site.register(Order, OrderAdmin)
+
+
+class CustomUserAdmin(UserAdmin):
+    # Поля, которые будут отображаться в списке пользователей
+    list_display = ('username', 'email', 'first_name', 'last_name', 'is_staff')
+    # Поля, по которым можно фильтровать пользователей
+    list_filter = ('is_staff', 'is_superuser', 'is_active', 'groups')
+
+    # Поля, которые можно редактировать в форме изменения пользователя
+    fieldsets = (
+        (None, {'fields': ('username', 'password')}),
+        (_('Personal info'), {'fields': ('first_name', 'last_name', 'email')}),
+        (_('Permissions'), {'fields': ('is_active', 'is_staff', 'is_superuser', 'groups', 'user_permissions')}),
+        (_('Important dates'), {'fields': ('last_login', 'date_joined')}),
+    )
+
+    # Поля, которые отображаются при создании пользователя
+    add_fieldsets = (
+        (None, {
+            'classes': ('wide',),
+            'fields': ('username', 'email', 'password1', 'password2'),
+        }),
+    )
+
+    # По каким полям будет осуществляться поиск
+    search_fields = ('username', 'email', 'first_name', 'last_name')
+    ordering = ('username',)
+    filter_horizontal = ('groups', 'user_permissions',)
+
+
+# Регистрируем модель пользователя с кастомным отображением в админке
+admin.site.register(CustomUser, CustomUserAdmin)
