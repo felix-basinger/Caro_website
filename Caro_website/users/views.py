@@ -205,6 +205,15 @@ def process_order(request):
 
 
 def password_reset_request(request):
+    user_agent = get_user_agent(request)
+
+    if user_agent.is_mobile:
+        template = 'users/mobile/password_reset_request.html'
+    elif user_agent.is_tablet:
+        template = 'users/tablet/password_reset_request.html'
+    else:
+        template = 'users/password_reset_request.html'
+
     if request.method == 'POST':
         form = PasswordResetRequestForm(request.POST)
         if form.is_valid():
@@ -219,10 +228,18 @@ def password_reset_request(request):
                 return redirect('register')
     else:
         form = PasswordResetRequestForm()
-    return render(request, 'users/password_reset_request.html', {'form': form})
+    return render(request, template, {'form': form})
 
 
 def password_reset_code(request):
+    user_agent = get_user_agent(request)
+
+    if user_agent.is_mobile:
+        template = 'users/mobile/password_reset_code.html'
+    elif user_agent.is_tablet:
+        template = 'users/tablet/password_reset_code.html'
+    else:
+        template = 'users/password_reset_code.html'
     if request.method == 'POST':
         if 'resend_code' in request.POST:
             email = request.session.get('reset_email')
@@ -251,10 +268,18 @@ def password_reset_code(request):
     else:
         form = PasswordResetConfirmForm()
 
-    return render(request, 'users/password_reset_code.html', {'form': form})
+    return render(request, template, {'form': form})
 
 
 def set_new_password(request, user_id):
+    user_agent = get_user_agent(request)
+
+    if user_agent.is_mobile:
+        template = 'users/mobile/set_new_password.html'
+    elif user_agent.is_tablet:
+        template = 'users/tablet/set_new_password.html'
+    else:
+        template = 'users/set_new_password.html'
     user = CustomUser.objects.get(id=user_id)
     if request.method == 'POST':
         form = SetNewPasswordForm(request.POST)
@@ -266,4 +291,25 @@ def set_new_password(request, user_id):
             return redirect('account')
     else:
         form = SetNewPasswordForm()
-    return render(request, 'users/set_new_password.html', {'form': form})
+    return render(request, template, {'form': form})
+
+
+@csrf_exempt
+def resend_reset_code(request):
+    if request.method == 'POST':
+        email = request.session.get('reset_email')
+        if not email:
+            return JsonResponse({'status': 'error', 'message': 'Email not found in session.'}, status=400)
+
+        reset_code = PasswordResetCode.objects.filter(user__email=email).last()
+
+        if reset_code and reset_code.created_at >= timezone.now() - timedelta(minutes=2):
+            return JsonResponse({'status': 'error', 'message': 'Please wait 2 minutes before resending the code.'},
+                                status=400)
+
+        # Отправляем код снова
+        send_password_reset_email.delay(email)
+        return JsonResponse({'status': 'success'})
+
+    return JsonResponse({'status': 'error', 'message': 'Invalid request method.'}, status=405)
+
