@@ -4,9 +4,12 @@
 
 {% block content %}
 <style>
-    .container {
-        padding-left: 0px;
-        padding-right: 0px;
+    .image-container {
+        padding: 20px 0px;
+    }
+
+    .text-overlay {
+        border-radius: 0px;
     }
 </style>
 <div class="header-main" style="padding-left: 20px; padding-right: 20px; ">
@@ -14,29 +17,29 @@
 <!--     <h1 style="text-align: center; width: calc(100% - 500px); font-size: 40px; margin: 0 auto; padding: 150px 0; text-align: center;"><b>THE WORLD'S LEADING ANTIQUE <br>E-COMMERCE</b></h1>-->
     <a href="{% url 'about' %}" class="btn btn-light" style="width: 150px; height: 50px; font-size: 22px;">About us</a>
 </div>
-<div class="container mt-1" style="width: 90vw; max-width: 1230px; padding-top: 50px;">
+<div class="container mt-1" style="width: 100vw; max-width: 100%; padding-top: 50px;">
     <div class="row">
-        <div class="col-md-6 image-container mb-6" style="padding-left: 0px; padding-right: 0px;">
+        <div class=" image-container mb-6"  >
             <a href="{% url 'product_by_tag' 'T-shirts' %}" class="image-link animate-on-scroll">
                 <img src="{% static 'images/black-tshirt.jpg' %}" alt="Furniture" class="img-fluid">
                 <div class="text-overlay">T-shirts</div>
             </a>
         </div>
-        <div class="col-md-6 image-container mb-6" style="padding-left: 0px; padding-right: 0px;">
+        <div class="image-container mb-6"  >
             <a href="{% url 'product_by_tag' 'Hoodie' %}" class="image-link animate-on-scroll">
                 <img src="{% static 'images/black-hoodie.jpg' %}" alt="Watches" class="img-fluid">
                 <div class="text-overlay">Hoodies</div>
             </a>
         </div>
-        <div class="col-md-6 image-container mb-6" style="padding-left: 0px; padding-right: 0px;">
+        <div class="image-container mb-6"  >
             <a href="{% url 'product_by_tag' 'Shoes' %}" class="image-link animate-on-scroll">
                 <img src="{% static 'images/shoes.jpg' %}" alt="Fabrics" class="img-fluid">
                 <div class="text-overlay">Shoes</div>
             </a>
         </div>
-        <div class="col-md-6 image-container mb-6" style="padding-left: 0px; padding-right: 0px;">
+        <div class="  image-container mb-6"  >
             <a href="{% url 'product_by_tag' 'Caps' %}" class="image-link animate-on-scroll">
-                <img src="{% static 'images/cap.jpg' %}" alt="Realty" class="img-fluid">
+                <img src="{% static 'images/new_cap.jpg' %}" alt="Realty" class="img-fluid">
                 <div class="text-overlay">Caps</div>
             </a>
         </div>

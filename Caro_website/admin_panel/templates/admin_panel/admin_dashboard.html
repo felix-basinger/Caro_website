@@ -2,7 +2,7 @@
 
 {% block content %}
 <div class="container">
-    <h1 class="my-4">Admin Dashboard</h1>
+    <h1 class="my-4 text-center">Admin Dashboard</h1>
 
     <!-- Products Section -->
     <h2>Products</h2>
@@ -13,8 +13,9 @@
                 <h3 class="card-title">{{ product.name }}</h3>
                 <p class="card-text">{{ product.description }}</p>
                 <p class="card-text"><strong>${{ product.price }}</strong></p>
+                <p class="card-text"><strong>Quantity: {{ product.quantity }}</strong></p>
                 {% if product.discount %}
-                <p class="card-text text-success">Discount: {{ product.discount.name }} ({{ product.discount.discount_percent }}%)</p>
+                <p class="card-text text-success">Discount: {{ product.discount.name }} ({{product.discount.discount_percent }}%)</p>
                 {% endif %}
                 <button class="btn btn-primary edit-product" data-id="{{ product.id }}">Edit</button>
                 <button class="btn btn-danger delete-product" data-id="{{ product.id }}">Delete</button>
@@ -67,59 +68,63 @@
     </div>
 
     <h2 class="mt-4">Discounts</h2>
-<div id="discount-list" class="">
-    {% for discount in discounts %}
-    <div class="card mb-3" data-id="{{ discount.id }}">
-        <div class="card-body">
-            <h3 class="card-title">{{ discount.name }} - {{ discount.discount_percent }}%</h3>
-            <p class="card-text">Start Date: {{ discount.start_date }}</p>
-            <p class="card-text">End Date: {{ discount.end_date }}</p>
-            <p class="card-text">Is Active: {{ discount.is_active }}</p>
-            <button class="btn btn-primary edit-discount" data-id="{{ discount.id }}">Edit</button>
-            <button class="btn btn-danger delete-discount" data-id="{{ discount.id }}">Delete</button>
+    <div id="discount-list" class="">
+        {% for discount in discounts %}
+        <div class="card mb-3" data-id="{{ discount.id }}">
+            <div class="card-body">
+                <h3 class="card-title">{{ discount.name }} - {{ discount.discount_percent }}%</h3>
+                <p class="card-text">Start Date: {{ discount.start_date }}</p>
+                <p class="card-text">End Date: {{ discount.end_date }}</p>
+                <p class="card-text">Is Active: {{ discount.is_active }}</p>
+                <button class="btn btn-primary edit-discount" data-id="{{ discount.id }}">Edit</button>
+                <button class="btn btn-danger delete-discount" data-id="{{ discount.id }}">Delete</button>
+            </div>
         </div>
+        {% endfor %}
     </div>
-    {% endfor %}
-</div>
-<button id="add-discount" class="btn btn-success">Add New Discount</button>
+    <button id="add-discount" class="btn btn-success">Add New Discount</button>
 
-<!-- Discount Form Modal -->
-<div class="modal fade" id="discount-form-modal" tabindex="-1" role="dialog" aria-labelledby="discountFormModalLabel"
-     aria-hidden="true">
-    <div class="modal-dialog" role="document">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="discountFormModalLabel">Discount</h5>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                </button>
-            </div>
-            <div class="modal-body">
-                <form id="discount-form">
-                    {% csrf_token %}
-                    <input type="hidden" name="id" id="discount-id">
-                    <div class="form-group">
-                        <label for="discount-name">Name</label>
-                        <input type="text" class="form-control" name="name" id="discount-name" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="discount-percent">Discount Percent</label>
-                        <input type="number" step="0.01" class="form-control" name="discount_percent" id="discount-percent" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="discount-start-date">Start Date</label>
-                        <input type="datetime-local" class="form-control" name="start_date" id="discount-start-date" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="discount-end-date">End Date</label>
-                        <input type="datetime-local" class="form-control" name="end_date" id="discount-end-date" required>
-                    </div>
-                    <button type="submit" class="btn btn-primary">Save</button>
-                </form>
+    <!-- Discount Form Modal -->
+    <div class="modal fade" id="discount-form-modal" tabindex="-1" role="dialog"
+         aria-labelledby="discountFormModalLabel"
+         aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="discountFormModalLabel">Discount</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <form id="discount-form">
+                        {% csrf_token %}
+                        <input type="hidden" name="id" id="discount-id">
+                        <div class="form-group">
+                            <label for="discount-name">Name</label>
+                            <input type="text" class="form-control" name="name" id="discount-name" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="discount-percent">Discount Percent</label>
+                            <input type="number" step="0.01" class="form-control" name="discount_percent"
+                                   id="discount-percent" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="discount-start-date">Start Date</label>
+                            <input type="datetime-local" class="form-control" name="start_date" id="discount-start-date"
+                                   required>
+                        </div>
+                        <div class="form-group">
+                            <label for="discount-end-date">End Date</label>
+                            <input type="datetime-local" class="form-control" name="end_date" id="discount-end-date"
+                                   required>
+                        </div>
+                        <button type="submit" class="btn btn-primary">Save</button>
+                    </form>
+                </div>
             </div>
         </div>
     </div>
-</div>
 
     <!-- Product Form Modal -->
     <div class="modal fade" id="product-form-modal" tabindex="-1" role="dialog" aria-labelledby="productFormModalLabel"
@@ -152,6 +157,12 @@
                         </div>
 
                         <div class="form-group">
+                            <label for="product-quantity">Quantity</label>
+                            <input type="number" class="form-control" name="quantity" id="product-quantity"
+                                   value="{{ product.quantity }}" required>
+                        </div>
+
+                        <div class="form-group">
                             <label for="product-tags">Tags</label>
                             <select class="form-control" name="tags" id="product-tags" multiple>
                                 {% for tag in tags %}
@@ -165,8 +176,7 @@
                             <select class="form-control" name="discount" id="product-discount">
                                 <option value="">No Discount</option>
                                 {% for discount in discounts %}
-                                <option value="{{ discount.id }}">{{ discount.name }} - {{ discount.discount_percent }}%
-                                </option>
+                                <option value="{{ discount.id }}">{{ discount.name }} - {{ discount.discount_percent }}%</option>
                                 {% endfor %}
                             </select>
                         </div>
@@ -214,6 +224,7 @@
             $('#product-name').val(product ? product.name : '');
             $('#product-description').val(product ? product.description : '');
             $('#product-price').val(product ? product.price : '');
+            $('#product-quantity').val(product ? product.quantity : '');
             if (product && product.tags) {
                 $('#product-tags').val(product.tags.map(tag => tag.id));
             } else {

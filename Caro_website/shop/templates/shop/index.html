@@ -1,4 +1,4 @@
-{% extends 'base_desktop.html' %}
+{% extends 'base_index.html' %}
 
 {% load static %}
 {% block content %}
@@ -7,35 +7,35 @@
 <!--     <h1 style="text-align: center; width: calc(100% - 500px); font-size: 40px; margin: 0 auto; padding: 150px 0; text-align: center;"><b>THE WORLD'S LEADING ANTIQUE <br>E-COMMERCE</b></h1>-->
     <a href="{% url 'about' %}" class="btn btn-light" style="width: 150px; height: 50px; font-size: 22px;">About us</a>
 </div>
-<div class="container mt-1" style="width: 90vw; max-width: 1230px; padding-top: 100px;">
-    <div class="row">
-        <div class="col-md-6 image-container mb-6" style="padding-left: 0px;">
+<div class="container mt-1 d-flex justify-content-center" style="width: 100vw; max-width: 100%; padding-top: 100px;">
+    <div class="row justify-content-center" style="width: 100%;">
+        <div class="col-md-6 image-container mb-6 d-flex justify-content-center" style="padding-left: 0px;">
             <a href="{% url 'product_by_tag' 'T-shirts' %}" class="image-link animate-on-scroll">
-                <img src="{% static 'images/black-tshirt.jpg' %}" alt="Furniture" class="img-fluid">
+                <img src="{% static 'images/black-tshirt.jpg' %}" alt="T-shirts" class="img-fluid">
                 <div class="overlay">
                     <div class="text">T-shirts</div>
                 </div>
             </a>
         </div>
-        <div class="col-md-6 image-container mb-6" style="padding-right: 0px;">
+        <div class="col-md-6 image-container mb-6 d-flex justify-content-center" style="padding-right: 0px;">
             <a href="{% url 'product_by_tag' 'Hoodie' %}" class="image-link animate-on-scroll">
-                <img src="{% static 'images/black-hoodie.jpg' %}" alt="Watches" class="img-fluid">
+                <img src="{% static 'images/black-hoodie.jpg' %}" alt="Hoodies" class="img-fluid">
                 <div class="overlay">
                     <div class="text">Hoodies</div>
                 </div>
             </a>
         </div>
-        <div class="col-md-6 image-container mb-6" style="padding-left: 0px">
+        <div class="col-md-6 image-container mb-6 d-flex justify-content-center" style="padding-left: 0px;">
             <a href="{% url 'product_by_tag' 'Shoes' %}" class="image-link animate-on-scroll">
-                <img src="{% static 'images/shoes.jpg' %}" alt="Fabrics" class="img-fluid">
+                <img src="{% static 'images/shoes.jpg' %}" alt="Shoes" class="img-fluid">
                 <div class="overlay">
                     <div class="text">Shoes</div>
                 </div>
             </a>
         </div>
-        <div class="col-md-6 image-container mb-6" style="padding-right: 0px;">
+        <div class="col-md-6 image-container mb-6 d-flex justify-content-center" style="padding-right: 0px;">
             <a href="{% url 'product_by_tag' 'Caps' %}" class="image-link animate-on-scroll">
-                <img src="{% static 'images/cap.jpg' %}" alt="Realty" class="img-fluid">
+                <img src="{% static 'images/new_cap.jpg' %}" alt="Caps" class="img-fluid">
                 <div class="overlay">
                     <div class="text">Caps</div>
                 </div>
@@ -43,6 +43,7 @@
         </div>
     </div>
 </div>
+
 
 <script>
 document.addEventListener('DOMContentLoaded', function() {

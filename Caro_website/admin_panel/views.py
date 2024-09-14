@@ -41,6 +41,7 @@ def product_detail(request, pk):
         'name': product.name,
         'description': product.description,
         'price': product.price,
+        'quantity': product.quantity,
         'tags': [{'id': tag.id, 'name': tag.name} for tag in product.tags.all()],
         'images': [{'id': image.id, 'url': image.image.url} for image in product.images.all()]
     }

@@ -9,16 +9,32 @@
     {% for product in products %}
     <a style="text-decoration: none;" href="{% url 'product_detail' product.pk %}">
         <div class="card" style="border-radius: 0px; border: 0px;">
-            <img src="{{ product.images.first.image.url }}" class="card-img-top" alt="{{ product.name }}">
+
+            <div class=" " style="position: relative;">
+                <!-- Изображение продукта -->
+                <img style="border-radius: 0px;" src="{{ product.images.first.image.url }}" class="card-img-top"
+                     alt="{{ product.name }}">
+
+                <!-- Пеленка и надпись "Sold Out", если количество товара 0 -->
+                {% if product.quantity == 0 %}
+                <div class="sold-out-overlay">
+                    <span>Sold Out</span>
+                </div>
+                {% endif %}
+            </div>
+
+            <!-- Проверка на скидку -->
             {% if product.discount and product.discount.is_active %}
             <div class="discount-label" style="position: absolute; top: 10px; left: 10px; background-color: black; color: white; padding: 5px; border-radius: 3px; font-size: 16px;">
                 Save {{ product.discount.discount_percent }}%
             </div>
-        {% endif %}
+            {% endif %}
+
             <div class="card-body" style="text-decoration: none;">
                 <div class="d-flex justify-content-end add-to-cart" style="gap: 10px; position: relative">
-
+                    <!-- Кнопки добавления в корзину и избранное -->
                     {% if user.is_authenticated or session_key %}
+                    {% if product.quantity > 0 %}
                     <button data-url="{% url 'add_to_favorites' product.id %}"
                             class="btn add-to-favorites"
                             data-product-id="{{ product.id }}" style="padding-bottom: 0;">
@@ -33,8 +49,20 @@
                            style="font-size: 35px;"></i>
                     </button>
                     {% else %}
+                   <button data-url="{% url 'add_to_favorites' product.id %}"
+                            class="btn add-to-favorites"
+                            data-product-id="{{ product.id }}" style="padding-bottom: 0;">
+                        <i class="bi {% if product.id in favorite_product_ids %}bi-heart-fill{% else %}bi-heart{% endif %}"
+                           style="font-size: 35px;"></i>
+                    </button>
+
+                    <button class="btn disabled" style="padding-bottom: 0;" disabled>
+                        <i class="bi bi-cart" style="font-size: 35px; color: grey;"></i>
+                    </button>
+                    {% endif %}
+                    {% else %}
                     <button class="btn redirect-login" style="padding-bottom: 0;">
-                        <i class="bi bi-heart" style="font-size: 35px;"></i>
+                        <i class="bi bi-heart" style="font-size: 35px; "></i>
                     </button>
 
                     <button class="btn redirect-login" style="padding-bottom: 0;">
@@ -43,7 +71,9 @@
                     {% endif %}
 
                 </div>
-                <h5 class="card-title" style="color: black; text-align: center;">{{ product.name }}</h5>
+
+                <h5 class="card-title" style="color: black; font-size: 26px; text-align: center;">{{ product.name }}</h5>
+
                 {% if product.discount and product.discount.is_active %}
                 <p class="card-text" style="color: black; font-size: 22px; text-align: center;">
                     <del>${{ product.price|floatformat:2 }}</del>

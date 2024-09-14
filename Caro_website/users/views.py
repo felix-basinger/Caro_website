@@ -175,7 +175,10 @@ def order_confirmation(request):
     return render(request, template)
 
 
+from django.db import transaction
+
 @csrf_exempt
+@login_required
 def process_order(request):
     if request.method == 'POST':
         data = json.loads(request.body)
@@ -198,7 +201,23 @@ def process_order(request):
         status = data.get('status')
         if status == 'COMPLETED':
             cart = Cart.objects.get(user=request.user)
+
+            # Обработка товаров в корзине
+            with transaction.atomic():
+                for item in cart.items.all():
+                    product = item.product
+
+                    # Проверяем, что количество на складе больше или равно количеству в корзине
+                    if product.quantity >= item.quantity:
+                        product.quantity -= item.quantity  # Уменьшаем количество на складе
+                        product.save()
+                    else:
+                        # Если товара недостаточно, возвращаем ошибку (это можно изменить по необходимости)
+                        return JsonResponse({'error': f'Not enough stock for {product.name}'}, status=400)
+
+            # Очищаем корзину после успешного оформления заказа
             cart.items.all().delete()
+
         return JsonResponse({'status': 'success'})
 
     return JsonResponse({'error': 'Invalid request method'}, status=400)

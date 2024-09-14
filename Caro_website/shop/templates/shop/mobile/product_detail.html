@@ -141,31 +141,42 @@
                 {% endif %}</strong></p>
 
         <div class="d-flex justify-content-center add-to-cart" style="gap: 0px; position: relative; padding: 15px 0; right: 0;">
-            {% if user.is_authenticated or session_key %}
-                    <button data-url="{% url 'add_to_favorites' product.id %}"
-                            class="btn add-to-favorites"
-                            data-product-id="{{ product.id }}" style="border: 1px solid;">
-                        <i class="bi {% if product.id in favorite_product_ids %}bi-heart-fill{% else %}bi-heart{% endif %}"
-                           style="font-size: 24px; color: black;"></i>
-                    </button>
+            {% if product.quantity > 0 %}
+                {% if user.is_authenticated or session_key %}
+                <button data-url="{% url 'add_to_favorites' product.id %}"
+                        class="btn add-to-favorites"
+                        data-product-id="{{ product.id }}" style="border: 1px solid;  ">
+                    <i class="bi {% if product.id in favorite_product_ids %}bi-heart-fill{% else %}bi-heart{% endif %}"
+                       style="font-size: 24px;"></i>
+                </button>
 
-                    <button data-url="{% url 'cart:add_to_cart' product.id %}"
-                            class="btn cart-button"
-                            data-product-id="{{ product.id }}" style="border: 1px solid;">
-                        <i class="bi {% if product.in_cart %}bi-cart-check-fill{% else %}bi-cart{% endif %}"
-                           style="font-size: 24px; font-style: normal;"> Add to cart</i>
-                    </button>
-                    {% else %}
-                    <button class="btn redirect-login" style="border: 1px solid;">
-                        <i class="bi {% if product.id in favorite_product_ids %}bi-heart-fill{% else %}bi-heart{% endif %}"
-                           style="font-size: 24px; color: black;"></i>
-                    </button>
+                <button data-url="{% url 'cart:add_to_cart' product.id %}"
+                        class="btn cart-button"
+                        data-product-id="{{ product.id }}" style="border: 1px solid;  ">
+                    <i class="bi {% if product.in_cart %}bi-cart-check-fill{% else %}bi-cart{% endif %}"
+                       style="font-size: 24px; font-style: normal;"> Add to cart</i>
+                </button>
+                {% else %}
+                <button class="btn redirect-login" style="border: 1px solid;  ">
+                    <i class="bi {% if product.id in favorite_product_ids %}bi-heart-fill{% else %}bi-heart{% endif %}"
+                       style="font-size: 24px;"></i>
+                </button>
 
-                    <button class="btn redirect-login" style="border: 1px solid;">
-                        <i class="bi {% if product.in_cart %}bi-cart-check-fill{% else %}bi-cart{% endif %}"
-                           style="font-size: 24px; font-style: normal;"> Add to cart</i>
-                    </button>
-                    {% endif %}
+                <button class="btn redirect-login" style="border: 1px solid;  ">
+                    <i class="bi {% if product.in_cart %}bi-cart-check-fill{% else %}bi-cart{% endif %}"
+                       style="font-size: 24px; font-style: normal;"> Add to cart</i>
+                </button>
+                {% endif %}
+                {% else %}
+                <button class="btn redirect-login" style="border: 1px solid;  ">
+                    <i class="bi {% if product.id in favorite_product_ids %}bi-heart-fill{% else %}bi-heart{% endif %}"
+                       style="font-size: 24px;"></i>
+                </button>
+                <!-- Отключенная кнопка, если товара нет в наличии -->
+                <button class="btn disabled" style="border: 1px solid; color: grey;" disabled>
+                    <i class="bi bi-cart" style="font-size: 24px; font-style: normal;"> Out of stock</i>
+                </button>
+                {% endif %}
         </div>
 
     </div>

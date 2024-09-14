@@ -7,7 +7,7 @@ from shop.models import Discount
 class ProductForm(forms.ModelForm):
     class Meta:
         model = Product
-        fields = ['name', 'description', 'price', 'tags', 'discount']
+        fields = ['name', 'description', 'price', 'quantity', 'tags', 'discount']
         widgets = {
             'tags': forms.CheckboxSelectMultiple(),
             'discount': forms.Select(),

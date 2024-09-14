@@ -222,12 +222,13 @@ h4 {
     opacity: 0;
     transition: opacity 0.5s ease, border-radius 0.2s ease;
 
-    background-color: rgba(0, 0, 0, 0.6);
+    background-color: rgba(255, 255, 255, 0.6);
     border-radius: 5px;
 }
 
 .text {
     color: white;
+    -webkit-text-stroke: 1px black;
     font-size: 70px;
     position: absolute;
     top: 50%;
@@ -254,29 +255,29 @@ h4 {
 }
 
          /* Chat Button */
-        .chat-button-container {
-            position: fixed;
-            bottom: 20px;
-            right: 20px;
-            z-index: 1000;
-        }
+<!--        .chat-button-container {-->
+<!--            position: fixed;-->
+<!--            bottom: 20px;-->
+<!--            right: 20px;-->
+<!--            z-index: 1000;-->
+<!--        }-->
 
-        .chat-button {
-            background-color: #343a41;
-            color: white;
-            width: 60px;
-            height: 60px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-        }
+<!--        .chat-button {-->
+<!--            background-color: #343a41;-->
+<!--            color: white;-->
+<!--            width: 60px;-->
+<!--            height: 60px;-->
+<!--            border-radius: 50%;-->
+<!--            display: flex;-->
+<!--            align-items: center;-->
+<!--            justify-content: center;-->
+<!--            cursor: pointer;-->
+<!--            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);-->
+<!--        }-->
 
-        .chat-button i {
-            font-size: 28px;
-        }
+<!--        .chat-button i {-->
+<!--            font-size: 28px;-->
+<!--        }-->
 
         /* Chat Window */
         .chat-window {
@@ -400,7 +401,64 @@ h4 {
     color: black;
 }
 
+.sold-out-overlay {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(255, 255, 255, 0.5); /* Полупрозрачный черный фон */
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        color: white;
+        font-size: 36px;
+        font-weight: bold;
+        z-index: 1;
+        border-radius: 0px; /* Если у изображений есть закругления, добавьте аналогичные */
+    }
 
+    .sold-out-overlay span {
+        text-align: center;
+    }
+
+    .card {
+        position: relative;
+    }
+
+.btn.disabled {
+    border: none;
+    cursor: not-allowed;
+}
+
+/* Стили для анимации */
+.categories-dropdown-menu {
+    display: none;
+    opacity: 0;
+    transition: opacity 0.4s ease, transform 0.4s ease;
+    transform: translateY(-10px); /* Легкое смещение вверх при закрытии */
+}
+
+.categories-dropdown-menu.show {
+    display: block;
+    opacity: 1;
+    transform: translateY(0); /* Возвращаем на место при открытии */
+}
+
+.categories-dropdown-menu {
+    padding: 5px 0px;
+    width: 125px;
+    text-align: center;
+    font-size: 19px;
+}
+
+.categories-dropdown-menu .dropdown-item {
+    padding-top: 5px;
+}
+
+.dropdown-divider {
+    margin: 7px 0;
+}
 
     </style>
 </head>
@@ -423,27 +481,31 @@ h4 {
 
             <nav class="nav">
                 <a href="{% url 'new_index' %}" class="nav-link home-dropdown-toggle"
-                       role="button" aria-haspopup="true" aria-expanded="false">{% trans 'Home' %}</a>
-                <div class="dropdown home-dropdown">
-
-                    <a href="{% url 'product_list' %}" class="nav-link home-dropdown-toggle" id="homeDropdown"
-                       role="button" aria-haspopup="true" aria-expanded="false">{% trans 'Catalog' %}</a>
-                    <div class="dropdown-menu home-dropdown-menu" aria-labelledby="homeDropdown">
-                        <a class="dropdown-item" href="{% url 'product_by_tag' 'T-shirts' %}">{% trans 'T-shirts' %}</a>
-                        <a class="dropdown-item" href="{% url 'product_by_tag' 'Hoodie' %}">{% trans 'Hoodie' %}</a>
-                        <a class="dropdown-item" href="{% url 'product_by_tag' 'Shoes' %}">{% trans 'Shoes' %}</a>
-                        <a class="dropdown-item" href="{% url 'product_by_tag' 'Caps' %}">{% trans 'Caps' %}</a>
+                   role="button" aria-haspopup="true" aria-expanded="false">{% trans 'Home' %}</a>
+                <div class="dropdown categories-dropdown">
+                    <a href="javascript:void(0);" class="nav-link" id="categoriesDropdownToggle"
+                       role="button" aria-haspopup="true" aria-expanded="false">{% trans 'Categories' %}</a>
+                    <div class="dropdown-menu categories-dropdown-menu" aria-labelledby="categoriesDropdownToggle" id="categoriesDropdownMenu">
+                        <a class="dropdown-item" style="padding: 0 7px; padding-top: 5px;" href="{% url 'product_list' %}">{% trans 'All products' %}</a>
+                        <div class="dropdown-divider"></div>
+                        <a class="dropdown-item" style="padding: 0 7px;"  href="{% url 'product_by_tag' 'T-shirts' %}">{% trans 'T-shirts' %}</a>
+                        <div class="dropdown-divider"></div> <!-- Разделительная линия -->
+                        <a class="dropdown-item" style="padding: 0 7px;" href="{% url 'product_by_tag' 'Hoodie' %}">{% trans 'Hoodie' %}</a>
+                        <div class="dropdown-divider"></div> <!-- Разделительная линия -->
+                        <a class="dropdown-item" style="padding: 0 7px;" href="{% url 'product_by_tag' 'Shoes' %}">{% trans 'Shoes' %}</a>
+                        <div class="dropdown-divider"></div> <!-- Разделительная линия -->
+                        <a class="dropdown-item" style="padding: 0 7px; padding-bottom: 5px;" href="{% url 'product_by_tag' 'Caps' %}">{% trans 'Caps' %}</a>
                     </div>
                 </div>
                 <a href="{% url 'sale_products' %}" class="nav-link home-dropdown-toggle"
-                       role="button" aria-haspopup="true" aria-expanded="false">{% trans 'Sale' %}</a>
+                   role="button" aria-haspopup="true" aria-expanded="false">{% trans 'Sale' %}</a>
                 <a href="{% url 'new_index' %}" class="nav-link home-dropdown-toggle"
-                       role="button" aria-haspopup="true" aria-expanded="false">{% trans 'Contact' %}</a>
+                   role="button" aria-haspopup="true" aria-expanded="false">{% trans 'Contact' %}</a>
 
-<!--                <a href="{% url 'product_by_tag' 'Furniture' %}" class="nav-link">{% trans 'Furniture' %}</a>-->
-<!--                <a href="{% url 'product_by_tag' 'Watches' %}" class="nav-link">{% trans 'Watches' %}</a>-->
-<!--                <a href="{% url 'product_by_tag' 'Fabrics' %}" class="nav-link">{% trans 'Fabrics' %}</a>-->
-<!--                <a href="{% url 'product_by_tag' 'Realty' %}" class="nav-link">{% trans 'Realty' %}</a>-->
+                <!--                <a href="{% url 'product_by_tag' 'Furniture' %}" class="nav-link">{% trans 'Furniture' %}</a>-->
+                <!--                <a href="{% url 'product_by_tag' 'Watches' %}" class="nav-link">{% trans 'Watches' %}</a>-->
+                <!--                <a href="{% url 'product_by_tag' 'Fabrics' %}" class="nav-link">{% trans 'Fabrics' %}</a>-->
+                <!--                <a href="{% url 'product_by_tag' 'Realty' %}" class="nav-link">{% trans 'Realty' %}</a>-->
             </nav>
 
             {% if user.is_authenticated %}
@@ -477,7 +539,8 @@ h4 {
                     <img src="{% static 'images/icon-planet-earth.png' %}" alt="{% trans 'Planet' %}"
                          style="width: 24px; height: 24px;">
                 </a>
-                <div class="dropdown-menu custom-dropdown-menu" style="transform: translate3d(-15px, 50px, 0px); position: absolute; top: 0;"
+                <div class="dropdown-menu custom-dropdown-menu"
+                     style="transform: translate3d(-15px, 50px, 0px); position: absolute; top: 0;"
                      aria-labelledby="languageDropdown">
                     <form action="{% url 'set_language' %}" method="post">
                         {% csrf_token %}
@@ -513,18 +576,8 @@ h4 {
 </main>
 <div class="chat-button-container">
     <span id="chatButton" class="chat-button">
-        <i class="bi bi-chat-dots-fill"></i>
+
     </span>
-    <div id="chatWindow" class="chat-window d-none">
-        <div class="chat-window-header">
-            <span>{% trans "Contact the Seller" %}</span>
-            <span id="closeChat" class="close-chat">&times;</span>
-        </div>
-        <div class="chat-window-body">
-            <p>{% trans "You can contact the seller via Telegram." %}</p>
-            <a href="https://t.me/basinger_f" target="_blank" class="btn btn-dark">{% trans "Go to Telegram" %}</a>
-        </div>
-    </div>
 </div>
 <footer class="bg-white text-center py-3 mt-auto">
     <div class="container-footer">
@@ -537,6 +590,19 @@ h4 {
 <script src="https://cdnjs.cloudflare.com/ajax/libs/lightbox2/2.11.3/js/lightbox.min.js"></script>
 <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.mask/1.14.16/jquery.mask.min.js"></script>
+<!--Start of Tawk.to Script-->
+<script type="text/javascript">
+    var Tawk_API=Tawk_API||{}, Tawk_LoadStart=new Date();
+    (function(){
+    var s1=document.createElement("script"),s0=document.getElementsByTagName("script")[0];
+    s1.async=true;
+    s1.src='https://embed.tawk.to/66e5a8f6ea492f34bc13acdc/1i7oho11i';
+    s1.charset='UTF-8';
+    s1.setAttribute('crossorigin','*');
+    s0.parentNode.insertBefore(s1,s0);
+    })();
+</script>
+<!--End of Tawk.to Script-->
 
 <script>
     function initializeAutocomplete(id) {
@@ -645,6 +711,44 @@ h4 {
             const dropdownMenu = dropdown.querySelector('.dropdown-menu');
             dropdownMenu.classList.remove('show');
         });
+    });
+});
+</script>
+<script>
+   document.addEventListener('DOMContentLoaded', function() {
+    const categoriesDropdownToggle = document.getElementById('categoriesDropdownToggle');
+    const categoriesDropdownMenu = document.getElementById('categoriesDropdownMenu');
+
+    categoriesDropdownToggle.addEventListener('click', function(event) {
+        event.stopPropagation();
+
+        // Плавное открытие/закрытие меню
+        if (categoriesDropdownMenu.classList.contains('show')) {
+            categoriesDropdownMenu.classList.remove('show');
+
+            // Добавляем задержку для плавного закрытия перед скрытием элемента
+            setTimeout(function() {
+                categoriesDropdownMenu.style.display = 'none';
+            }, 300); // 300ms соответствует длительности анимации
+        } else {
+            categoriesDropdownMenu.style.display = 'block';
+
+            // Немного задерживаем добавление класса для правильной работы анимации
+            setTimeout(function() {
+                categoriesDropdownMenu.classList.add('show');
+            }, 10);
+        }
+    });
+
+    // Закрываем меню при клике вне его
+    document.addEventListener('click', function() {
+        if (categoriesDropdownMenu.classList.contains('show')) {
+            categoriesDropdownMenu.classList.remove('show');
+
+            setTimeout(function() {
+                categoriesDropdownMenu.style.display = 'none';
+            }, 300);
+        }
     });
 });
 

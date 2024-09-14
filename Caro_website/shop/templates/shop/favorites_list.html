@@ -10,14 +10,27 @@
 
     <a style="text-decoration: none;" href="{% url 'product_detail' product.pk %}">
         <div class="card" style="border-radius: 0px; border: 0px;">
-            <img src="{{ product.images.first.image.url }}" class="card-img-top" alt="{{ product.name }}">
+            <div class=" " style="position: relative;">
+                <!-- Изображение продукта -->
+                <img style="border-radius: 0px;" src="{{ product.images.first.image.url }}" class="card-img-top"
+                     alt="{{ product.name }}">
+
+                <!-- Пеленка и надпись "Sold Out", если количество товара 0 -->
+                {% if product.quantity == 0 %}
+                <div class="sold-out-overlay">
+                    <span>Sold Out</span>
+                </div>
+                {% endif %}
+            </div>
+
             {% if product.discount and product.discount.is_active %}
             <div class="discount-label" style="position: absolute; top: 10px; left: 10px; background-color: black; color: white; padding: 5px; border-radius: 3px; font-size: 16px;">
                 Save {{ product.discount.discount_percent }}%
             </div>
-        {% endif %}
+            {% endif %}
+
             <div class="card-body" style="text-decoration: none;">
-                 <div class="d-flex justify-content-end add-to-cart" style="gap: 10px; position: relative">
+                <div class="d-flex justify-content-end add-to-cart" style="gap: 10px; position: relative">
 
                     <button data-url="{% url 'remove_from_favorites' product.id %}"
                             class="btn remove-favorite-button"
@@ -26,16 +39,24 @@
                            style="font-size: 35px;"></i>
                     </button>
 
+                    {% if product.quantity > 0 %}
+                    <!-- Кнопка добавления в корзину, если товар в наличии -->
                     <button data-url="{% url 'cart:add_to_cart' product.id %}"
                             class="btn cart-button"
                             data-product-id="{{ product.id }}" style="padding-bottom: 0;">
                         <i class="bi {% if product.in_cart %}bi-cart-check-fill{% else %}bi-cart{% endif %}"
                            style="font-size: 35px;"></i>
                     </button>
-
+                    {% else %}
+                    <!-- Отключенная кнопка, если товара нет в наличии -->
+                    <button class="btn disabled" style="padding-bottom: 0;" disabled>
+                        <i class="bi bi-cart" style="font-size: 35px; color: grey;"></i>
+                    </button>
+                    {% endif %}
                 </div>
+
                 <h5 class="card-title" style="color: black; text-align: center;">{{ product.name }}</h5>
-                <!--                    <p class="card-text">{{ product.description }}</p>-->
+
                 {% if product.discount and product.discount.is_active %}
                 <p class="card-text" style="color: black; font-size: 22px; text-align: center;">
                     <del>${{ product.price|floatformat:2 }}</del>
@@ -44,27 +65,14 @@
                 {% else %}
                 <p class="card-text" style="color: black; font-size: 22px; text-align: center;">${{ product.price|floatformat:2 }}</p>
                 {% endif %}
-<!--                <span class="add-to-cart" style="top: 340px;">-->
-<!--                        <button data-url="{% url 'remove_from_favorites' product.id %}"-->
-<!--                                class="btn btn-outline-secondary remove-favorite-button"-->
-<!--                                data-product-id="{{ product.id }}">-->
-<!--                         <img src="{% static 'images/cancel-heart.png' %}" alt="Heart" class="cart-logo"-->
-<!--                              style="width: 25px; height: 25px;">-->
-<!--                    </button>-->
-<!--                    <button data-url="{% url 'cart:add_to_cart' product.id %}" class="btn btn-outline-secondary">-->
-<!--                         <img src="{% static 'images/icon-cart.png' %}" alt="Cart" class="cart-logo"-->
-<!--                              style="width: 25px; height: 25px;">-->
-<!--                    </button>-->
-<!--                </span>-->
-
             </div>
         </div>
     </a>
 
-     {% endfor %}
-
+    {% endfor %}
 
 </div>
+
 {% else %}
 <div style="text-align: center; align-items; center;">
     <h1 style="text-align: center; ">You haven't added your favorite items yet.</h1>

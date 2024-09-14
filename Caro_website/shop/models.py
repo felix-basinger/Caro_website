@@ -34,6 +34,7 @@ class Product(models.Model):
     price = models.DecimalField(max_digits=10, decimal_places=2)
     image = models.ImageField(upload_to='products/', default='images/noimage_detail.png')
     tags = models.ManyToManyField(Tag, related_name='products')
+    quantity = models.PositiveIntegerField(default=0)
     discount = models.ForeignKey(Discount, null=True, blank=True, on_delete=models.SET_NULL, related_name='products')
     created_at = models.DateTimeField(auto_now_add=True)
 

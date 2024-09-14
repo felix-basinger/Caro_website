@@ -30,7 +30,7 @@ ALLOWED_HOSTS = [
     '192.168.1.224',
     'localhost',
     '[::1]:8000',
-    'c41e-151-38-82-204.ngrok-free.app',
+    'd03c-151-46-64-144.ngrok-free.app',
 ]
 
 # Application definition
@@ -189,6 +189,6 @@ CELERY_TIMEZONE = 'Europe/Rome'
 
 
 CSRF_TRUSTED_ORIGINS = [
-    'https://c41e-151-38-82-204.ngrok-free.app',
+    'https://d03c-151-46-64-144.ngrok-free.app',
 ]
 
